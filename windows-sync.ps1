@@ -15,7 +15,7 @@
 #>
 
 param (
-    [string]$ServerUrl = "http://localhost:3000",
+    [string]$ServerUrl = "https://obikul-ai-command-center.onrender.com",
     [int]$RetrySeconds = 5
 )
 

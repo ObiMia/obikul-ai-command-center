@@ -42,6 +42,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
+// Root Cockpit & Health check endpoints
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboard-demo.html'));
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'HEALTHY', uptime: process.uptime(), timestamp: Date.now() });
+});
+
 // ==========================================
 // 1. IN-MEMORY & PERSISTED STATE
 // ==========================================
