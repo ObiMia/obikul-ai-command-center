@@ -1,0 +1,57 @@
+{
+  "name": "Obikul AI Command Center",
+  "short_name": "Obikul AI",
+  "description": "Autonomous AI Executive Assistant & Multi-Channel Command Center by Commander Obikul Mia",
+  "start_url": "./dashboard-demo.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#030712",
+  "theme_color": "#00f2fe",
+  "lang": "en-US",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live Telemetry Feed",
+      "short_name": "Feed",
+      "description": "View live incoming messages and auto-replies",
+      "url": "./dashboard-demo.html#feed",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Global Geo-Radar",
+      "short_name": "Geo Radar",
+      "description": "Track international inbound messages in real time",
+      "url": "./dashboard-demo.html#analytics",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Bot Dispatch & Tasks",
+      "short_name": "Dispatch",
+      "description": "Assign autonomous directives to connected bots",
+      "url": "./dashboard-demo.html#dispatch",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Audio Briefing",
+      "short_name": "Briefing",
+      "description": "Listen to real-time AI synthesized voice report",
+      "url": "./dashboard-demo.html#briefing",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

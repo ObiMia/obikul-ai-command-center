@@ -1,0 +1,29 @@
+{
+  "name": "obikul-ai-command-center",
+  "version": "1.0.0",
+  "description": "Autonomous AI Executive Assistant & Multi-Channel Command Center for Commander Obikul Mia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "sync": "powershell -ExecutionPolicy Bypass -File ./windows-sync.ps1"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "ws": "^8.17.0",
+    "dotenv": "^16.4.5"
+  },
+  "keywords": [
+    "ai-agent",
+    "command-center",
+    "multi-channel",
+    "autonomous-bot",
+    "gmail-bot",
+    "instagram-bot",
+    "whatsapp-bot",
+    "pwa"
+  ],
+  "author": "Commander Obikul Mia",
+  "license": "MIT"
+}

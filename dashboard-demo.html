@@ -1,0 +1,3738 @@
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Obi Mia • Autonomous AI Mission Control</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#030712">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Obikul AI">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<style>
+  :root {
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Ultra-Luxe Cyber Dark Palette */
+    --bg-deep: #05070e;
+    --bg-card: rgba(14, 20, 36, 0.72);
+    --bg-card-hover: rgba(22, 32, 56, 0.88);
+    --bg-elevated: rgba(20, 29, 50, 0.95);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-bright: rgba(56, 189, 248, 0.4);
+    --border-neon-cyan: #00f2fe;
+
+    --text-pure: #ffffff;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* High Voltage Accents */
+    --cyan: #00f2fe;
+    --blue: #38bdf8;
+    --indigo: #6366f1;
+    --purple: #a855f7;
+    --emerald: #10b981;
+    --amber: #f59e0b;
+    --rose: #f43f5e;
+    --gold: #fbbf24;
+
+    /* 3D Shadows & Specular Lights */
+    --shadow-3d: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 242, 254, 0.12);
+    --shadow-glow-cyan: 0 0 30px rgba(0, 242, 254, 0.35);
+    --shadow-glow-emerald: 0 0 25px rgba(16, 185, 129, 0.35);
+    --shadow-glow-purple: 0 0 25px rgba(168, 85, 247, 0.35);
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-full: 9999px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow-x: clip;
+    position: relative;
+    padding: 16px;
+    padding-top: 10px;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(0, 242, 254, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(168, 85, 247, 0.05) 0px, transparent 60%);
+  }
+
+  /* 3D WEBGL/CANVAS BACKGROUND */
+  #neuralCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .main-shell {
+    width: 100%;
+    max-width: 1480px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 3D INTERACTIVE TILT CLASS */
+  .tilt-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-3d);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.1, 0.8, 0.2, 1), border-color 0.2s, box-shadow 0.2s;
+    transform-style: preserve-3d;
+  }
+
+  .tilt-card:hover {
+    border-color: rgba(0, 242, 254, 0.45);
+    box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 242, 254, 0.25);
+  }
+
+  /* TOP STATUS & NAVIGATION BAR - STICKY PERMANENT EXECUTIVE COCKPIT */
+  .header-cockpit {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    padding: 16px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-radius: var(--radius-xl);
+    background: rgba(8, 13, 26, 0.98);
+    border: 1px solid rgba(0, 242, 254, 0.45);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(0, 242, 254, 0.2);
+    transition: all 0.25s ease;
+  }
+
+  /* USER IDENTITY & 3D PHOTO UPLOAD */
+  .profile-cockpit {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .avatar-3d-hologram {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    cursor: pointer;
+  }
+
+  .hologram-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--cyan), var(--indigo), var(--purple), var(--cyan));
+    animation: spinHologram 4s linear infinite;
+    z-index: 1;
+    filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.6));
+  }
+
+  @keyframes spinHologram {
+    100% { transform: rotate(360deg); }
+  }
+
+  .avatar-core {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #090e1c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 2;
+    border: 2px solid var(--bg-deep);
+  }
+
+  .avatar-img-view {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-text-initials {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ffffff, var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .avatar-edit-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cyan);
+    z-index: 3;
+    border-radius: 50%;
+  }
+
+  .avatar-3d-hologram:hover .avatar-edit-overlay {
+    opacity: 1;
+  }
+
+  .avatar-live-beacon {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: var(--emerald);
+    border: 2px solid var(--bg-deep);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--emerald);
+    z-index: 4;
+  }
+
+  .commander-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .commander-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .commander-name {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    background: linear-gradient(135deg, #ffffff 40%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 25px rgba(0, 242, 254, 0.35);
+  }
+
+  .badge-vip-owner {
+    font-size: 11px;
+    padding: 3px 12px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    border-radius: var(--radius-full);
+    color: var(--gold);
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .commander-subline {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+  }
+
+  /* GLOWING INSTALL MOBILE APP BUTTON */
+  .btn-install-app-glow {
+    background: linear-gradient(135deg, #00f2fe 0%, #10b981 100%) !important;
+    color: #030712 !important;
+    border: none !important;
+    font-family: var(--font-body) !important;
+    font-weight: 900 !important;
+    font-size: 13.5px !important;
+    padding: 9px 20px !important;
+    border-radius: var(--radius-full) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.5), 0 4px 15px rgba(16, 185, 129, 0.4) !important;
+    transition: all 0.25s cubic-bezier(0.1, 0.8, 0.2, 1) !important;
+    animation: pulseInstallAppBtn 2.2s infinite ease-in-out !important;
+  }
+
+  @keyframes pulseInstallAppBtn {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.45), 0 0 8px rgba(16, 185, 129, 0.4);
+    }
+    50% {
+      transform: scale(1.04);
+      box-shadow: 0 0 32px rgba(0, 242, 254, 0.8), 0 0 20px rgba(16, 185, 129, 0.7);
+    }
+  }
+
+  .btn-install-app-glow:hover {
+    transform: scale(1.06) translateY(-2px) !important;
+    box-shadow: 0 0 40px rgba(0, 242, 254, 0.9), 0 0 25px rgba(16, 185, 129, 0.8) !important;
+  }
+
+  /* QUICK APP INSTALL ALERT BAR */
+  .app-install-alert-bar {
+    background: linear-gradient(90deg, rgba(0, 242, 254, 0.12) 0%, rgba(16, 185, 129, 0.12) 50%, rgba(99, 102, 241, 0.12) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    border-radius: var(--radius-lg);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 242, 254, 0.08);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .app-install-alert-bar:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 10px 35px rgba(0, 242, 254, 0.25);
+  }
+
+  .alert-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .app-pulse-chip {
+    background: var(--cyan);
+    color: #030712;
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 12px var(--cyan);
+  }
+
+  .alert-bar-text {
+    font-size: 13.5px;
+    color: var(--text-primary);
+  }
+
+  .btn-install-app-glow-mini {
+    background: linear-gradient(135deg, #00f2fe 0%, #10b981 100%);
+    color: #030712;
+    border: none;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 12px;
+    padding: 7px 16px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    transition: all 0.2s;
+  }
+
+  .btn-install-app-glow-mini:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.7);
+  }
+
+  .commander-subline {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  /* TELEMETRY ENGINE CHIPS */
+  .telemetry-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .telemetry-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+  }
+
+  .pulse-beacon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--emerald);
+    box-shadow: 0 0 8px var(--emerald);
+    animation: pulseGlow 1.8s infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  /* INTERACTIVE AUDIO BRIEFING WITH SOUND VISUALIZER */
+  .audio-briefing-pill {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    color: white;
+    padding: 8px 18px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.25s;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.25);
+  }
+
+  .audio-briefing-pill:hover {
+    transform: translateY(-2px) scale(1.03);
+    border-color: var(--cyan);
+    box-shadow: var(--shadow-glow-purple);
+  }
+
+  .sound-equalizer {
+    display: flex;
+    align-items: center;
+    gap: 2.5px;
+    height: 14px;
+  }
+
+  .eq-bar {
+    width: 3px;
+    height: 100%;
+    background: var(--cyan);
+    border-radius: 2px;
+    animation: eqBounce 1s infinite alternate;
+  }
+  .eq-bar:nth-child(2) { animation-delay: 0.2s; height: 50%; }
+  .eq-bar:nth-child(3) { animation-delay: 0.4s; height: 85%; }
+  .eq-bar:nth-child(4) { animation-delay: 0.15s; height: 35%; }
+
+  @keyframes eqBounce {
+    0% { height: 20%; }
+    100% { height: 100%; }
+  }
+
+  /* FULL AUTO 24/7 SWITCH */
+  .mode-switch-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mode-switch-box:hover {
+    background: rgba(16, 185, 129, 0.22);
+    box-shadow: var(--shadow-glow-emerald);
+  }
+
+  .mode-switch-box.approval-mode {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  .mode-light {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--emerald);
+    box-shadow: 0 0 10px var(--emerald);
+  }
+
+  .mode-switch-box.approval-mode .mode-light {
+    background: var(--amber);
+    box-shadow: 0 0 10px var(--amber);
+  }
+
+  .mode-txt {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--emerald);
+    letter-spacing: 0.04em;
+  }
+
+  .mode-switch-box.approval-mode .mode-txt {
+    color: var(--amber);
+  }
+
+  /* EMERGENCY PANIC FREEZE */
+  .panic-freeze-btn {
+    background: rgba(244, 63, 94, 0.15);
+    border: 1px solid rgba(244, 63, 94, 0.4);
+    color: #fecdd3;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .panic-freeze-btn:hover {
+    background: var(--rose);
+    color: white;
+    box-shadow: 0 0 25px rgba(244, 63, 94, 0.6);
+  }
+
+  /* 3D KPI METRICS ROW */
+  .metrics-3d-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .kpi-tile-3d {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .kpi-tile-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+  }
+
+  .kpi-icon-glass {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .kpi-giant-number {
+    font-family: var(--font-heading);
+    font-size: 34px;
+    font-weight: 900;
+    color: var(--text-pure);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .badge-kpi {
+    font-family: var(--font-body);
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+  }
+
+  .badge-cyan { background: rgba(0, 242, 254, 0.15); color: var(--cyan); border: 1px solid rgba(0, 242, 254, 0.3); }
+  .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+  .badge-purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+
+  .kpi-subdesc {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* NAVIGATION TABS (5 MAJOR POWER MODULES) */
+  .nav-tabs-deck {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(10, 15, 28, 0.8);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+  }
+
+  .nav-tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .nav-tab-btn:hover {
+    color: var(--text-pure);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .nav-tab-btn.active {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(99, 102, 241, 0.25));
+    border: 1px solid rgba(0, 242, 254, 0.5);
+    color: var(--cyan);
+    box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+  }
+
+  /* 2-COLUMN COCKPIT LAYOUT */
+  .cockpit-grid {
+    display: grid;
+    grid-template-columns: 1fr 410px;
+    gap: 20px;
+  }
+
+  @media (max-width: 1120px) {
+    .cockpit-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* VIEW 1: LIVE FEED & AUTONOMOUS ACTION STREAM */
+  .feed-board {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .feed-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 14px;
+  }
+
+  .feed-heading {
+    font-family: var(--font-heading);
+    font-size: 19px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .channel-filter-chips {
+    display: flex;
+    gap: 6px;
+  }
+
+  .filter-chip {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-chip.active {
+    background: var(--cyan);
+    color: #05070e;
+    border-color: var(--cyan);
+    font-weight: 800;
+  }
+
+  .stream-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .stream-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .stream-card:hover {
+    border-color: var(--border-bright);
+    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  }
+
+  .stream-header-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .platform-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+  }
+
+  .tag-gmail { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+  .tag-insta { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+  .tag-web { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .tag-fb { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+  .tag-whatsapp { background: rgba(37, 211, 102, 0.15); color: #4ade80; border: 1px solid rgba(37, 211, 102, 0.3); }
+
+  .sender-bold {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-pure);
+  }
+
+  .message-content-text {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* 3D ACTION DECISION CAPSULE */
+  .autonomous-decision-capsule {
+    background: rgba(6, 10, 20, 0.95);
+    border-left: 4px solid var(--emerald);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid rgba(16, 185, 129, 0.2);
+    border-right: 1px solid rgba(16, 185, 129, 0.2);
+    border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .capsule-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--emerald);
+  }
+
+  .ai-reason-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .ai-actual-reply {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #38bdf8;
+    border: 1px dashed rgba(56, 189, 248, 0.3);
+  }
+
+  /* VIEW 2: KANBAN LEAD CRM PIPELINE */
+  .kanban-shelf {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    overflow-x: auto;
+  }
+
+  @media (max-width: 1040px) {
+    .kanban-shelf {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .kanban-lane {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lane-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-pure);
+  }
+
+  .lead-deal-card {
+    background: rgba(10, 15, 28, 0.85);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12.5px;
+    transition: all 0.2s;
+  }
+
+  .lead-deal-card:hover {
+    border-color: var(--cyan);
+    transform: translateY(-2px);
+  }
+
+  .deal-amount {
+    font-family: var(--font-mono);
+    font-weight: 800;
+    color: var(--cyan);
+    font-size: 13.5px;
+  }
+
+  /* VIEW 3: KNOWLEDGE BASE WITH EDITABLE PRICING */
+  .kb-workspace {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .file-drop-zone {
+    border: 2px dashed rgba(0, 242, 254, 0.45);
+    background: rgba(0, 242, 254, 0.03);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .file-drop-zone:hover {
+    background: rgba(0, 242, 254, 0.08);
+    border-color: var(--cyan);
+    box-shadow: var(--shadow-glow-cyan);
+  }
+
+  /* VIEW 4: ANALYTICS */
+  .analytics-deck {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .chart-canvas-box {
+    background: rgba(10, 15, 28, 0.7);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    height: 300px;
+    position: relative;
+  }
+
+  /* =========================================================================
+     LIVE GLOBAL WORLD MAP GEO-TRACKER
+     ========================================================================= */
+  .geo-world-tracker-container {
+    background: rgba(8, 12, 24, 0.9);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .geo-header-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .cyber-map-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 420px;
+    background: radial-gradient(circle at 50% 50%, rgba(13, 27, 42, 0.85) 0%, rgba(2, 5, 14, 0.98) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: inset 0 0 40px rgba(0, 242, 254, 0.08), 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .radar-sweep-beam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 242, 254, 0.05) 45%, rgba(0, 242, 254, 0.25) 50%, rgba(16, 185, 129, 0.3) 51%, transparent 55%);
+    background-size: 200% 100%;
+    animation: sweepRadar 7s linear infinite;
+    z-index: 2;
+  }
+
+  @keyframes sweepRadar {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .map-hud-coordinates {
+    position: absolute;
+    top: 14px;
+    left: 18px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    z-index: 3;
+    pointer-events: none;
+    letter-spacing: 0.5px;
+    background: rgba(4, 8, 18, 0.7);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+  }
+
+  .cyber-svg-map {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    display: block;
+    z-index: 1;
+    position: relative;
+  }
+
+  .map-grid-line {
+    stroke: rgba(255, 255, 255, 0.04);
+    stroke-width: 0.8;
+  }
+
+  .map-grid-equator {
+    stroke: rgba(0, 242, 254, 0.15);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+  }
+
+  .map-continent-path {
+    fill: rgba(0, 242, 254, 0.07);
+    stroke: rgba(0, 242, 254, 0.3);
+    stroke-width: 1.2px;
+    transition: all 0.3s ease;
+  }
+
+  .map-continent-path:hover {
+    fill: rgba(0, 242, 254, 0.16);
+    stroke: rgba(0, 242, 254, 0.7);
+    filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4));
+  }
+
+  .map-arc-path {
+    fill: none;
+    stroke: url(#arcLaserGrad);
+    stroke-width: 1.6;
+    stroke-dasharray: 8 6;
+    animation: dashLaser 25s linear infinite;
+    opacity: 0.8;
+  }
+
+  @keyframes dashLaser {
+    to {
+      stroke-dashoffset: -1000;
+    }
+  }
+
+  .hub-beacon-group {
+    cursor: pointer;
+    transition: transform 0.25s ease;
+  }
+
+  .hub-beacon-group:hover {
+    transform: scale(1.3);
+  }
+
+  .beacon-ping-ring {
+    animation: pingRing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+    transform-origin: center;
+  }
+
+  .beacon-ping-ring-delayed {
+    animation: pingRing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+    animation-delay: 1.2s;
+    transform-origin: center;
+  }
+
+  @keyframes pingRing {
+    0% { r: 4; opacity: 0.95; stroke-width: 2.5; }
+    100% { r: 28; opacity: 0; stroke-width: 0.5; }
+  }
+
+  .map-floating-tooltip {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    background: rgba(5, 9, 20, 0.96);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--cyan);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    min-width: 280px;
+    max-width: 340px;
+    z-index: 10;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), var(--shadow-glow-cyan);
+    animation: fadeInTooltip 0.25s ease-out;
+  }
+
+  @keyframes fadeInTooltip {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .geo-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+
+  .geo-country-card {
+    background: rgba(10, 16, 32, 0.75);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .geo-country-card:hover {
+    border-color: var(--cyan);
+    background: rgba(0, 242, 254, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+
+  .geo-progress-bar {
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .geo-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--emerald));
+    border-radius: 3px;
+  }
+
+  /* VIEW 5: AI SANDBOX SIMULATOR */
+  .sandbox-deck {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* RIGHT SIDEBAR: COMMAND CENTER & TELEGRAM REMOTE */
+  .cockpit-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* 3D COMMAND BAR */
+  .command-deck-3d {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cmd-input-container {
+    position: relative;
+  }
+
+  .cmd-textarea-field {
+    width: 100%;
+    height: 90px;
+    background: rgba(6, 10, 20, 0.95);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px 42px 12px 12px;
+    color: var(--text-pure);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    resize: none;
+    transition: border-color 0.2s;
+  }
+
+  .cmd-textarea-field:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+  }
+
+  .mic-voice-button {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(99, 102, 241, 0.25);
+    border: 1px solid rgba(99, 102, 241, 0.5);
+    color: #c084fc;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mic-voice-button:hover {
+    background: var(--indigo);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .btn-run-directive {
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    color: #05070e;
+    border: none;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-glow-cyan);
+  }
+
+  .btn-run-directive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5);
+  }
+
+  /* TELEGRAM REMOTE CHAT SIMULATOR */
+  .telegram-mockup-card {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tg-conversation {
+    background: #0b141b;
+    border-radius: var(--radius-md);
+    padding: 12px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .tg-bubble-user {
+    align-self: flex-end;
+    background: #005c4b;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px 12px 2px 12px;
+    max-width: 80%;
+  }
+
+  .tg-bubble-bot {
+    align-self: flex-start;
+    background: #202c33;
+    color: #e9edef;
+    padding: 8px 12px;
+    border-radius: 12px 12px 12px 2px;
+    max-width: 85%;
+    line-height: 1.4;
+  }
+
+  /* WINDOWS 11 3D FLOATING TOAST NOTIFICATION */
+  .windows11-toast-card {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 390px;
+    background: rgba(11, 17, 33, 0.95);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(0, 242, 254, 0.5);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.8), var(--shadow-glow-cyan);
+    padding: 18px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: slideToastUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideToastUp {
+    from { opacity: 0; transform: translateY(40px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* MODAL BASE */
+  .glass-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 16px;
+  }
+
+  .modal-cockpit-window {
+    background: rgba(14, 20, 36, 0.95);
+    backdrop-filter: blur(35px);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 560px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.9), var(--shadow-glow-cyan);
+  }
+
+  /* MOBILE VIEW SWITCHER WRAPPER */
+  .mobile-container-frame {
+    max-width: 440px !important;
+    margin: 0 auto;
+    border: 10px solid #1e293b;
+    border-radius: 40px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+  }
+
+  /* MOBILE BOTTOM DOCK (NATIVE APP FEEL) */
+  .mobile-bottom-dock {
+    display: none;
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 480px;
+    background: rgba(8, 14, 28, 0.92);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    border-radius: var(--radius-full);
+    padding: 6px 14px;
+    z-index: 9990;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(0, 242, 254, 0.25);
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  @media (max-width: 860px) {
+    .header-cockpit {
+      position: sticky;
+      top: 6px;
+      padding: 12px 16px;
+      gap: 12px;
+      border-radius: var(--radius-lg);
+    }
+    .profile-cockpit {
+      width: 100%;
+      justify-content: flex-start;
+      gap: 12px;
+    }
+    .commander-name {
+      font-size: 21px !important;
+    }
+    .header-system-btns {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .header-system-btns .btn-install-app-glow {
+      order: -1;
+      width: 100%;
+      justify-content: center;
+      padding: 11px 18px !important;
+      font-size: 14px !important;
+    }
+    .mobile-bottom-dock {
+      display: flex;
+    }
+    body {
+      padding: 8px;
+      padding-bottom: 95px !important;
+    }
+    .nav-tabs-deck {
+      display: none;
+    }
+    .app-install-alert-bar {
+      padding: 12px 16px;
+      gap: 10px;
+    }
+    .btn-install-app-glow-mini {
+      width: 100%;
+      justify-content: center;
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+
+  .mobile-container-frame .mobile-bottom-dock {
+    display: flex;
+  }
+
+  .dock-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-body);
+    padding: 6px 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .dock-btn .dock-icon {
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+
+  .dock-btn:hover, .dock-btn.active {
+    color: var(--cyan);
+  }
+
+  .dock-btn.active .dock-icon {
+    transform: translateY(-2px) scale(1.15);
+    filter: drop-shadow(0 0 8px var(--cyan));
+  }
+
+  .dock-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    width: 14px;
+    height: 3px;
+    background: var(--cyan);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  /* PWA STEP CARDS IN MODAL */
+  .pwa-step-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.2s;
+  }
+
+  .pwa-step-card:hover {
+    border-color: rgba(0, 242, 254, 0.4);
+    background: rgba(0, 242, 254, 0.05);
+  }
+
+  .pwa-step-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(0, 242, 254, 0.12);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+</style>
+
+<!-- 3D NEURAL BACKGROUND CANVAS -->
+<canvas id="neuralCanvas"></canvas>
+
+<div class="main-shell" id="appShell">
+
+  <!-- 1. TOP EXECUTIVE COCKPIT WITH 3D USER AVATAR -->
+  <header class="header-cockpit">
+    <div class="profile-cockpit">
+      <!-- 3D HOLOGRAPHIC AVATAR -->
+      <div class="avatar-3d-hologram" onclick="openProfileModal()" title="Click to Upload Real Photo / Change Name">
+        <div class="hologram-ring"></div>
+        <div class="avatar-core">
+          <div class="avatar-text-initials" id="avatarInitials">OM</div>
+          <img src="" class="avatar-img-view" id="avatarImageElem" style="display: none;" alt="Commander Avatar">
+          <div class="avatar-edit-overlay">CHANGE</div>
+        </div>
+        <div class="avatar-live-beacon" title="AI Brain 24/7 Active"></div>
+      </div>
+
+      <div class="commander-info">
+        <div class="commander-title-row">
+          <span class="commander-name" id="commanderNameDisplay">Obikul Mia</span>
+          <span class="badge-vip-owner">👑 COMMANDER</span>
+        </div>
+        <div class="commander-subline">
+          <span>🧠 Executive Mission Control</span>
+          <span>•</span>
+          <span style="color: var(--cyan);">☁️ Cloud Server Node (Free 24/7)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEADER SYSTEM BUTTONS -->
+    <div class="header-system-btns" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <!-- PWA MOBILE APP INSTALL BUTTON (PROMINENT GLOW) -->
+      <button class="btn-install-app-glow" onclick="openMobileAppModal()" title="Install Obikul AI Mobile App">
+        <span>📲 Install Mobile App</span>
+      </button>
+
+      <!-- FULL AUTO 24/7 TOGGLE -->
+      <div class="mode-switch-box" id="autoModeBox" onclick="toggleFullAutoMode()" title="Switch between Full Auto & Approval Mode">
+        <div class="mode-light" id="modeLight"></div>
+        <span class="mode-txt" id="modeStatusText">⚡ FULL AUTO 24/7</span>
+      </div>
+
+      <!-- EMERGENCY KILL SWITCH -->
+      <button class="panic-freeze-btn" onclick="togglePanicStop()">
+        <span id="panicIcon">🛑</span>
+        <span id="panicText">Panic Freeze</span>
+      </button>
+
+      <!-- MORNING AI AUDIO BRIEFING & ELEVENLABS STUDIO -->
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <button class="audio-briefing-pill" onclick="triggerAudioBriefing()">
+          <div class="sound-equalizer" id="audioEqualizer" style="display: none;">
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+          </div>
+          <span id="audioBtnLabel">🎙️ Play Audio Briefing</span>
+        </button>
+        <button class="filter-chip" style="background: rgba(168, 85, 247, 0.18); color: #c084fc; border-color: #a855f7; font-weight: 800; padding: 7px 11px;" onclick="openVoiceConfigModal()" title="Configure ElevenLabs Voice AI">
+          <span>⚙️ ElevenLabs Studio</span>
+        </button>
+      </div>
+
+      <!-- TEST LAPTOP ALERT -->
+      <button class="filter-chip" style="background: rgba(0, 242, 254, 0.12); color: var(--cyan); border-color: var(--cyan); font-weight: 800;" onclick="testLaptopWakeupAlert()">
+        <span>💻 Test Laptop Wake-up</span>
+      </button>
+
+      <!-- MOBILE / DESKTOP VIEW TOGGLE -->
+      <button class="filter-chip" onclick="toggleMobileDeviceView()">
+        <span id="mobileIcon">📱</span>
+        <span id="mobileLabel">Mobile View</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- QUICK NOTIFICATION & APP INSTALL CALLOUT BANNER -->
+  <div class="app-install-alert-bar" onclick="openMobileAppModal()">
+    <div class="alert-bar-left">
+      <span class="app-pulse-chip">⚡ MOBILE READY</span>
+      <span class="alert-bar-text"><strong>Obikul AI Mobile App:</strong> Install on your Android or iPhone for 24/7 background alerts & instant cockpit control.</span>
+    </div>
+    <button class="btn-install-app-glow-mini" onclick="event.stopPropagation(); openMobileAppModal();">
+      <span>📲 Install App Now</span>
+    </button>
+  </div>
+
+  <!-- 2. 3D KEY EXECUTIVE KPI TILES -->
+  <section class="metrics-3d-grid">
+    <div class="tilt-card kpi-tile-3d">
+      <div class="kpi-tile-top">
+        <span>TOTAL MONITORED STREAMS</span>
+        <div class="kpi-icon-glass" style="color: var(--cyan);">📥</div>
+      </div>
+      <div class="kpi-giant-number">
+        <span>184</span>
+        <span class="badge-kpi badge-cyan">+32 today</span>
+      </div>
+      <div class="kpi-subdesc">Gmail, Instagram, Facebook & Webhooks</div>
+    </div>
+
+    <div class="tilt-card kpi-tile-3d">
+      <div class="kpi-tile-top">
+        <span>AUTONOMOUS ACTIONS TAKEN</span>
+        <div class="kpi-icon-glass" style="color: var(--emerald);">⚡</div>
+      </div>
+      <div class="kpi-giant-number">
+        <span>38</span>
+        <span class="badge-kpi badge-emerald">100% Speed</span>
+      </div>
+      <div class="kpi-subdesc">0 manual typing needed (Full Auto)</div>
+    </div>
+
+    <div class="tilt-card kpi-tile-3d">
+      <div class="kpi-tile-top">
+        <span>TIME SAVED TODAY</span>
+        <div class="kpi-icon-glass" style="color: var(--purple);">⏳</div>
+      </div>
+      <div class="kpi-giant-number">
+        <span>5.4 hrs</span>
+        <span class="badge-kpi badge-purple">High ROI</span>
+      </div>
+      <div class="kpi-subdesc">AI filtered 146 spams & drafted 38 deals</div>
+    </div>
+
+    <div class="tilt-card kpi-tile-3d">
+      <div class="kpi-tile-top">
+        <span>PENDING WINDOWS SYNC</span>
+        <div class="kpi-icon-glass" style="color: var(--amber);">💻</div>
+      </div>
+      <div class="kpi-giant-number">
+        <span>3 Deals</span>
+        <span class="badge-kpi" style="background: rgba(245, 158, 11, 0.2); color: var(--amber);">Ready</span>
+      </div>
+      <div class="kpi-subdesc">Will alert immediately on Laptop on</div>
+    </div>
+  </section>
+
+  <!-- 3. NAVIGATION TABS (ALL 5 ADVANCED VIEWS) -->
+  <nav class="nav-tabs-deck">
+    <button class="nav-tab-btn active" onclick="activateTab('feed', this)">
+      <span>⚡ Live Unified Stream & Actions</span>
+    </button>
+    <button class="nav-tab-btn" onclick="activateTab('kanban', this)">
+      <span>📌 Lead CRM Pipeline</span>
+    </button>
+    <button class="nav-tab-btn" onclick="activateTab('knowledge', this)">
+      <span>🧠 Knowledge Base & Document Brain</span>
+    </button>
+    <button class="nav-tab-btn" onclick="activateTab('analytics', this)">
+      <span>📊 Analytics & Global Geo-Tracker</span>
+    </button>
+    <button class="nav-tab-btn" onclick="activateTab('sandbox', this)">
+      <span>🧪 AI Sandbox Simulator</span>
+    </button>
+  </nav>
+
+  <!-- 4. MAIN WORKSPACE (2-COLUMN COCKPIT) -->
+  <main class="cockpit-grid">
+
+    <!-- LEFT COLUMN: VIEW PANELS -->
+    <div class="cockpit-main-content">
+
+      <!-- VIEW 1: LIVE UNIFIED STREAM & ACTIONS -->
+      <section class="tilt-card feed-board" id="panelFeed">
+        <div class="feed-toolbar">
+          <div class="feed-heading">
+            <span>⚡ 24/7 Autonomous Stream & Decisions</span>
+          </div>
+          <div class="channel-filter-chips">
+            <button class="filter-chip active" onclick="filterStream('all', this)">All (6)</button>
+            <button class="filter-chip" onclick="filterStream('gmail', this)">Gmail</button>
+            <button class="filter-chip" onclick="filterStream('instagram', this)">Instagram</button>
+            <button class="filter-chip" onclick="filterStream('website', this)">Website</button>
+          </div>
+        </div>
+
+        <div class="stream-list" id="streamContainer">
+          <!-- CARD 1: GMAIL CONTRACT PROPOSAL -->
+          <article class="stream-card" data-channel="gmail">
+            <div class="stream-header-line">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="platform-tag tag-gmail">✉️ Gmail</span>
+                <span class="sender-bold">Rajesh Sharma (Apex Media Agency)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="badge-kpi" style="background: rgba(16, 185, 129, 0.2); color: var(--emerald);">😍 High Intent (₹50k Deal)</span>
+                <span style="font-size: 11px; color: var(--text-muted);">8m ago</span>
+              </div>
+            </div>
+            <div class="message-content-text">
+              <strong>Subject: Commercial Video Contract & Agreement</strong><br>
+              "Hi Obi, we reviewed your portfolio and want to hire you for our upcoming video campaign. Can we schedule a 15-min call tomorrow at 3 PM to finalize?"
+            </div>
+            <div class="autonomous-decision-capsule">
+              <div class="capsule-top">
+                <span>🤖 Autonomous Action Taken by AI:</span>
+                <span style="font-family: var(--font-mono); font-size: 11px;">GOOGLE MEET INVITE SENT</span>
+              </div>
+              <div class="ai-reason-text">
+                <strong>AI Reasoning:</strong> Matched high-value commercial keyword. Verified calendar availability for 3:00 PM tomorrow & confirmed agreement.
+              </div>
+              <div class="ai-actual-reply">
+                "Hi Rajesh! Thanks for reaching out. Yes, 3:00 PM tomorrow works perfectly. I have created the meeting invite and sent the Google Meet link. Looking forward to partnering!"
+              </div>
+            </div>
+          </article>
+
+          <!-- CARD 2: INSTAGRAM AUDIO NOTE -->
+          <article class="stream-card" data-channel="instagram">
+            <div class="stream-header-line">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="platform-tag tag-insta">📸 Instagram DM</span>
+                <span class="sender-bold">@kavita_creations (Verified Creator)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="badge-kpi" style="background: rgba(168, 85, 247, 0.2); color: var(--purple);">🎙️ Voice Note Transcribed</span>
+                <span style="font-size: 11px; color: var(--text-muted);">24m ago</span>
+              </div>
+            </div>
+            <div class="message-content-text">
+              "Hey Obi! Loved your recent edits. Can you send your sponsorship rate-card and portfolio deck?"
+            </div>
+            <div class="autonomous-decision-capsule">
+              <div class="capsule-top">
+                <span>🤖 Autonomous Action Taken by AI:</span>
+                <span style="font-family: var(--font-mono); font-size: 11px;">RATE-CARD PDF DISPATCHED</span>
+              </div>
+              <div class="ai-reason-text">
+                <strong>AI Reasoning:</strong> Extracted pricing inquiry. Quoted standard ₹15,000 package & linked booking deck.
+              </div>
+              <div class="ai-actual-reply">
+                "Hey Kavita! Thanks so much! Our commercial packages start at ₹15,000. Here is our official Rate-Card PDF & portfolio link: [Link]. Excited to collaborate!"
+              </div>
+            </div>
+          </article>
+
+          <!-- CARD 3: WEBSITE URGENT INQUIRY -->
+          <article class="stream-card" data-channel="website">
+            <div class="stream-header-line">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="platform-tag tag-web">🌐 Website Form</span>
+                <span class="sender-bold">Amit Patel (Inquiry #8491)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="badge-kpi" style="background: rgba(244, 63, 94, 0.2); color: var(--rose);">🔥 Urgent Lead</span>
+                <span style="font-size: 11px; color: var(--text-muted);">45m ago</span>
+              </div>
+            </div>
+            <div class="message-content-text">
+              "Need custom bot setup for my e-commerce brand within 48 hours."
+            </div>
+            <div class="autonomous-decision-capsule">
+              <div class="capsule-top">
+                <span>🤖 Autonomous Action Taken by AI:</span>
+                <span style="font-family: var(--font-mono); font-size: 11px;">WELCOME EMAIL + ONBOARDING</span>
+              </div>
+              <div class="ai-actual-reply">
+                "Hi Amit, welcome to Obikul Automation! We have received your urgent request. Our onboarding specialist is on it. Please fill this 1-min requirement brief: [Link]."
+              </div>
+            </div>
+          </article>
+
+          <!-- CARD 4: FILTERED SPAM -->
+          <article class="stream-card" data-channel="gmail" style="opacity: 0.5;">
+            <div class="stream-header-line">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="platform-tag tag-gmail">✉️ Gmail</span>
+                <span class="sender-bold">CryptoFlash Newsletter</span>
+              </div>
+              <span class="badge-kpi" style="background: rgba(255,255,255,0.05); color: var(--text-muted);">🚫 Spam Muted</span>
+            </div>
+            <div class="message-content-text">
+              "Get 500% ROI on new token launch today!"
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-muted); font-style: italic;">
+              🛡️ AI Guard: Muted & archived automatically. Zero notification spam sent to laptop.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- VIEW 2: KANBAN LEAD CRM -->
+      <section class="tilt-card feed-board" id="panelKanban" style="display: none;">
+        <div class="feed-heading">
+          <span>📌 Autonomous Lead CRM & Pipeline</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary);">
+          Every conversation is categorized and tracked automatically from DM to Payment:
+        </p>
+
+        <div class="kanban-shelf">
+          <div class="kanban-lane">
+            <div class="lane-header">
+              <span>📥 New Inquiries (2)</span>
+              <span class="badge-kpi badge-cyan">Auto-Tagged</span>
+            </div>
+            <div class="lead-deal-card">
+              <strong>Sunil Verma</strong>
+              <span style="color: var(--text-secondary);">FB Page: Office Location</span>
+              <span class="deal-amount">₹8,000 Deal</span>
+            </div>
+            <div class="lead-deal-card">
+              <strong>Vikram Singh</strong>
+              <span style="color: var(--text-secondary);">WhatsApp: Custom Script</span>
+              <span class="deal-amount">₹12,000 Deal</span>
+            </div>
+          </div>
+
+          <div class="kanban-lane">
+            <div class="lane-header">
+              <span>📅 Meeting Booked (3)</span>
+              <span class="badge-kpi badge-purple">Synced</span>
+            </div>
+            <div class="lead-deal-card">
+              <strong>Rajesh Sharma (Apex)</strong>
+              <span style="color: var(--text-secondary);">Tomorrow 3:00 PM (Google Meet)</span>
+              <span class="deal-amount">₹50,000 Contract</span>
+            </div>
+            <div class="lead-deal-card">
+              <strong>@kavita_creations</strong>
+              <span style="color: var(--text-secondary);">Friday 5:00 PM (IG Live)</span>
+              <span class="deal-amount">₹15,000 Deal</span>
+            </div>
+          </div>
+
+          <div class="kanban-lane">
+            <div class="lane-header">
+              <span>💳 Payment Pending (1)</span>
+              <span class="badge-kpi" style="background: rgba(245,158,11,0.2); color:var(--amber);">Active</span>
+            </div>
+            <div class="lead-deal-card">
+              <strong>Amit Patel</strong>
+              <span style="color: var(--text-secondary);">Shopify Automation</span>
+              <span class="deal-amount">₹25,000 Pending</span>
+            </div>
+          </div>
+
+          <div class="kanban-lane">
+            <div class="lane-header">
+              <span>✅ Closed Deals (8)</span>
+              <span class="badge-kpi badge-emerald">Done</span>
+            </div>
+            <div class="lead-deal-card">
+              <strong>Digital Media Hub</strong>
+              <span style="color: var(--text-secondary);">Monthly Retainer</span>
+              <span class="deal-amount" style="color: var(--emerald);">₹1,20,000 / mo</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: KNOWLEDGE BASE -->
+      <section class="tilt-card kb-workspace" id="panelKnowledge" style="display: none;">
+        <div class="feed-heading">
+          <span>🧠 Knowledge Base & Document Brain</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary);">
+          Upload your rate-card PDF, contract terms, or service guidelines. AI memorizes them to quote exact prices:
+        </p>
+
+        <div class="file-drop-zone" onclick="simulateFileUpload()">
+          <span style="font-size: 36px;">📄</span>
+          <strong style="font-size: 15px; color: var(--text-pure);">Click to Upload Rate-Card PDF / Price List / Catalog</strong>
+          <span style="font-size: 12px; color: var(--cyan);">Instant ingestion into 24/7 AI Brain</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span>📄</span>
+              <div>
+                <strong>Obikul_Commercial_Rate_Card_2026.pdf</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">Ingested 24/7 • 42 Pricing Rules Active</div>
+              </div>
+            </div>
+            <span class="badge-kpi badge-emerald">✓ Active</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: ANALYTICS & GRAPH -->
+      <section class="tilt-card analytics-deck" id="panelAnalytics" style="display: none;">
+        <!-- 1. 24-Hour Traffic Chart -->
+        <div class="feed-heading">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <span>📊 24-Hour Stream Traffic & Performance ROI</span>
+            <span class="badge-kpi badge-cyan">⚡ 445 Total Ingestions Today</span>
+          </div>
+        </div>
+        <div class="chart-canvas-box">
+          <canvas id="trafficAnalyticsChart"></canvas>
+        </div>
+
+        <!-- 2. LIVE GLOBAL WORLD MAP GEO-TRACKER -->
+        <div class="geo-world-tracker-container">
+          <!-- Toolbar Header -->
+          <div class="geo-header-toolbar">
+            <div>
+              <div style="font-size: 16px; font-weight: 800; color: var(--text-pure); display: flex; align-items: center; gap: 8px;">
+                <span>🗺️</span>
+                <span>Live Global Message Origin & Geo-Tracker</span>
+                <span class="badge-kpi badge-emerald">● 24/7 Radar Active</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+                Autonomous AI tracking incoming inquiries, rate card requests & leads across international hubs.
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button class="filter-chip active" id="geoBtnAll" onclick="filterGeoMap('all', this)">🌐 All Channels (<span id="geoCountAll">445</span>)</button>
+              <button class="filter-chip" id="geoBtnGmail" onclick="filterGeoMap('gmail', this)">📧 Gmail (<span id="geoCountGmail">186</span>)</button>
+              <button class="filter-chip" id="geoBtnInsta" onclick="filterGeoMap('insta', this)">📸 Insta (<span id="geoCountInsta">192</span>)</button>
+              <button class="filter-chip" id="geoBtnWeb" onclick="filterGeoMap('web', this)">🌐 Web/FB (<span id="geoCountWeb">67</span>)</button>
+              <button class="btn-run-directive" style="padding: 6px 14px; font-size: 12px;" onclick="simulateInboundPing()">
+                <span>📡 Simulate Inbound Ping</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Futuristic Cyber World Map Canvas & Overlay -->
+          <div class="cyber-map-wrapper" id="cyberMapWrapper">
+            <!-- Sweeping Radar Beam Effect -->
+            <div class="radar-sweep-beam"></div>
+
+            <!-- Live HUD Coordinates Header -->
+            <div class="map-hud-coordinates">
+              <span>📍 HQ NODE: OBIKUL-CLOUD-HQ (INDIA)</span>
+              <span>🛰️ TELEMETRY: 8 ACTIVE REGIONS</span>
+              <span>⚡ LATENCY: 0.8s AVG</span>
+            </div>
+
+            <!-- SVG Vector Map -->
+            <svg id="cyberWorldSvg" viewBox="0 0 1000 500" class="cyber-svg-map">
+              <defs>
+                <!-- Arc Laser Gradient -->
+                <linearGradient id="arcLaserGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.2"/>
+                  <stop offset="50%" stop-color="#00f2fe" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.3"/>
+                </linearGradient>
+
+                <!-- Beacon Glow Filter -->
+                <filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Map Coordinate Grid Lines -->
+              <g class="map-grid-lines">
+                <!-- Longitudes -->
+                <line x1="100" y1="0" x2="100" y2="500" class="map-grid-line" />
+                <line x1="200" y1="0" x2="200" y2="500" class="map-grid-line" />
+                <line x1="300" y1="0" x2="300" y2="500" class="map-grid-line" />
+                <line x1="400" y1="0" x2="400" y2="500" class="map-grid-line" />
+                <line x1="500" y1="0" x2="500" y2="500" class="map-grid-line" />
+                <line x1="600" y1="0" x2="600" y2="500" class="map-grid-line" />
+                <line x1="700" y1="0" x2="700" y2="500" class="map-grid-line" />
+                <line x1="800" y1="0" x2="800" y2="500" class="map-grid-line" />
+                <line x1="900" y1="0" x2="900" y2="500" class="map-grid-line" />
+                <!-- Latitudes -->
+                <line x1="0" y1="100" x2="1000" y2="100" class="map-grid-line" />
+                <line x1="0" y1="200" x2="1000" y2="200" class="map-grid-line" />
+                <line x1="0" y1="250" x2="1000" y2="250" class="map-grid-equator" />
+                <line x1="0" y1="300" x2="1000" y2="300" class="map-grid-line" />
+                <line x1="0" y1="400" x2="1000" y2="400" class="map-grid-line" />
+              </g>
+
+              <!-- Continent Geometries -->
+              <g class="map-continents">
+                <!-- North America -->
+                <path class="map-continent-path" d="M 110,65 L 170,45 L 230,50 L 300,60 L 345,95 L 330,135 L 285,155 L 255,225 L 205,245 L 165,195 L 140,130 L 105,95 Z" />
+                <!-- Central America / Mexico -->
+                <path class="map-continent-path" d="M 180,230 L 245,240 L 275,280 L 285,305 L 255,300 L 205,255 Z" />
+                <!-- Greenland -->
+                <path class="map-continent-path" d="M 330,40 L 395,30 L 415,75 L 365,95 L 325,65 Z" />
+                <!-- South America -->
+                <path class="map-continent-path" d="M 270,305 L 330,310 L 375,345 L 360,425 L 320,480 L 290,470 L 280,390 L 255,340 Z" />
+                <!-- UK & Ireland -->
+                <path class="map-continent-path" d="M 455,130 L 480,120 L 485,145 L 465,155 Z M 445,135 L 455,130 L 455,145 Z" />
+                <!-- Scandinavia -->
+                <path class="map-continent-path" d="M 515,65 L 550,55 L 565,95 L 535,130 L 515,110 Z" />
+                <!-- Europe Main -->
+                <path class="map-continent-path" d="M 470,155 L 530,140 L 580,135 L 590,185 L 530,205 L 465,200 L 450,180 Z" />
+                <!-- Iberia (Spain/Portugal) -->
+                <path class="map-continent-path" d="M 450,205 L 485,200 L 480,230 L 440,225 Z" />
+                <!-- Italy -->
+                <path class="map-continent-path" d="M 515,200 L 530,230 L 520,240 L 505,210 Z" />
+                <!-- Africa -->
+                <path class="map-continent-path" d="M 450,230 L 570,225 L 610,275 L 610,340 L 565,430 L 515,425 L 475,355 L 440,290 Z" />
+                <path class="map-continent-path" d="M 615,370 L 630,380 L 620,420 L 608,400 Z" />
+                <!-- Middle East -->
+                <path class="map-continent-path" d="M 575,225 L 640,230 L 635,280 L 590,290 L 580,250 Z" />
+                <!-- Russia & Northern Asia -->
+                <path class="map-continent-path" d="M 580,125 L 680,95 L 820,80 L 890,105 L 865,160 L 760,170 L 680,180 L 585,175 Z" />
+                <!-- India & South Asia -->
+                <path class="map-continent-path" d="M 650,225 L 720,230 L 730,280 L 690,345 L 660,295 L 645,250 Z" />
+                <!-- China & East Asia -->
+                <path class="map-continent-path" d="M 720,180 L 830,180 L 850,250 L 780,280 L 720,260 L 700,210 Z" />
+                <!-- Japan -->
+                <path class="map-continent-path" d="M 880,170 L 905,185 L 895,230 L 870,210 Z" />
+                <!-- Southeast Asia -->
+                <path class="map-continent-path" d="M 750,265 L 795,270 L 785,330 L 755,320 Z" />
+                <!-- Indonesia & Pacific -->
+                <path class="map-continent-path" d="M 770,350 L 850,355 L 840,375 L 760,365 Z M 830,280 L 850,310 L 835,325 Z" />
+                <!-- Australia & New Zealand -->
+                <path class="map-continent-path" d="M 800,380 L 890,370 L 920,410 L 900,470 L 820,465 L 785,415 Z" />
+                <path class="map-continent-path" d="M 945,460 L 960,470 L 940,500 Z" />
+              </g>
+
+              <!-- Realtime Data Arcs to India Hub (x:685, y:275) -->
+              <g class="map-arcs" id="mapDataArcs">
+                <!-- From USA NY -->
+                <path class="map-arc-path" d="M 230,175 Q 450,60 685,275" id="arc_us" />
+                <!-- From USA SF -->
+                <path class="map-arc-path" d="M 175,180 Q 400,40 685,275" />
+                <!-- From Canada -->
+                <path class="map-arc-path" d="M 245,155 Q 450,50 685,275" id="arc_ca" />
+                <!-- From UK London -->
+                <path class="map-arc-path" d="M 472,140 Q 570,170 685,275" id="arc_uk" />
+                <!-- From Germany Berlin -->
+                <path class="map-arc-path" d="M 510,148 Q 590,170 685,275" id="arc_de" />
+                <!-- From UAE Dubai -->
+                <path class="map-arc-path" d="M 618,250 Q 645,245 685,275" id="arc_ae" />
+                <!-- From Singapore -->
+                <path class="map-arc-path" d="M 772,335 Q 735,320 685,275" id="arc_sg" />
+                <!-- From Australia -->
+                <path class="map-arc-path" d="M 885,440 Q 800,380 685,275" id="arc_au" />
+              </g>
+
+              <!-- Interactive Glowing Hub Beacons -->
+              <g class="map-beacons" id="mapBeaconsGroup">
+                <!-- 1. INDIA (HQ Node) -->
+                <g class="hub-beacon-group" onclick="showHubDetails('in')">
+                  <circle cx="685" cy="275" r="8" fill="none" stroke="#10b981" class="beacon-ping-ring" />
+                  <circle cx="685" cy="275" r="8" fill="none" stroke="#00f2fe" class="beacon-ping-ring-delayed" />
+                  <circle cx="685" cy="275" r="6" fill="#10b981" filter="url(#glowFilter)" />
+                  <circle cx="685" cy="275" r="3" fill="#ffffff" />
+                  <text x="685" y="260" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="800" fill="#10b981" text-anchor="middle">🇮🇳 OBIKUL HQ</text>
+                </g>
+
+                <!-- 2. USA (New York) -->
+                <g class="hub-beacon-group" onclick="showHubDetails('us')">
+                  <circle cx="230" cy="175" r="6" fill="none" stroke="#00f2fe" class="beacon-ping-ring" />
+                  <circle cx="230" cy="175" r="5" fill="#00f2fe" filter="url(#glowFilter)" />
+                  <circle cx="230" cy="175" r="2.5" fill="#ffffff" />
+                  <text x="230" y="162" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#38bdf8" text-anchor="middle">🇺🇸 USA (94)</text>
+                </g>
+
+                <!-- 3. UK (London) -->
+                <g class="hub-beacon-group" onclick="showHubDetails('uk')">
+                  <circle cx="472" cy="140" r="5" fill="none" stroke="#a78bfa" class="beacon-ping-ring" />
+                  <circle cx="472" cy="140" r="4.5" fill="#8b5cf6" filter="url(#glowFilter)" />
+                  <circle cx="472" cy="140" r="2" fill="#ffffff" />
+                  <text x="472" y="128" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#c084fc" text-anchor="middle">🇬🇧 UK (48)</text>
+                </g>
+
+                <!-- 4. UAE (Dubai) -->
+                <g class="hub-beacon-group" onclick="showHubDetails('ae')">
+                  <circle cx="618" cy="250" r="5" fill="none" stroke="#f59e0b" class="beacon-ping-ring" />
+                  <circle cx="618" cy="250" r="4.5" fill="#f59e0b" filter="url(#glowFilter)" />
+                  <circle cx="618" cy="250" r="2" fill="#ffffff" />
+                  <text x="618" y="238" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#fbbf24" text-anchor="middle">🇦🇪 UAE (42)</text>
+                </g>
+
+                <!-- 5. GERMANY (Berlin) -->
+                <g class="hub-beacon-group" onclick="showHubDetails('de')">
+                  <circle cx="510" cy="148" r="5" fill="none" stroke="#38bdf8" class="beacon-ping-ring" />
+                  <circle cx="510" cy="148" r="4" fill="#00f2fe" filter="url(#glowFilter)" />
+                  <circle cx="510" cy="148" r="2" fill="#ffffff" />
+                  <text x="510" y="136" font-family="'Plus Jakarta Sans', sans-serif" font-size="9.5" font-weight="700" fill="#7dd3fc" text-anchor="middle">🇩🇪 DE (31)</text>
+                </g>
+
+                <!-- 6. SINGAPORE -->
+                <g class="hub-beacon-group" onclick="showHubDetails('sg')">
+                  <circle cx="772" cy="335" r="5" fill="none" stroke="#34d399" class="beacon-ping-ring" />
+                  <circle cx="772" cy="335" r="4" fill="#10b981" filter="url(#glowFilter)" />
+                  <circle cx="772" cy="335" r="2" fill="#ffffff" />
+                  <text x="772" y="324" font-family="'Plus Jakarta Sans', sans-serif" font-size="9.5" font-weight="700" fill="#6ee7b7" text-anchor="middle">🇸🇬 SG (26)</text>
+                </g>
+
+                <!-- 7. CANADA (Toronto) -->
+                <g class="hub-beacon-group" onclick="showHubDetails('ca')">
+                  <circle cx="245" cy="155" r="4" fill="none" stroke="#f472b6" class="beacon-ping-ring" />
+                  <circle cx="245" cy="155" r="3.5" fill="#ec4899" filter="url(#glowFilter)" />
+                  <circle cx="245" cy="155" r="1.5" fill="#ffffff" />
+                  <text x="245" y="144" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#f472b6" text-anchor="middle">🇨🇦 CA (15)</text>
+                </g>
+
+                <!-- 8. AUSTRALIA (Sydney) -->
+                <g class="hub-beacon-group" onclick="showHubDetails('au')">
+                  <circle cx="885" cy="440" r="4" fill="none" stroke="#38bdf8" class="beacon-ping-ring" />
+                  <circle cx="885" cy="440" r="3.5" fill="#00f2fe" filter="url(#glowFilter)" />
+                  <circle cx="885" cy="440" r="1.5" fill="#ffffff" />
+                  <text x="885" y="428" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#38bdf8" text-anchor="middle">🇦🇺 AU (11)</text>
+                </g>
+              </g>
+            </svg>
+
+            <!-- Holographic Interactive Detail Card on Click/Hover -->
+            <div class="map-floating-tooltip" id="mapFloatingTooltip" style="display: none;">
+              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span id="tooltipFlag" style="font-size: 20px;">🇮🇳</span>
+                  <strong id="tooltipTitle" style="font-size: 14px; color: var(--text-pure);">India (HQ Node)</strong>
+                </div>
+                <button onclick="closeMapTooltip()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;">✕</button>
+              </div>
+              <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Active Volume:</span>
+                  <strong style="color: var(--cyan);" id="tooltipVolume">178 Messages</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Channels:</span>
+                  <span id="tooltipChannels" style="font-size: 11px;">Insta: 84 | Gmail: 72 | Web: 22</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">AI Latency:</span>
+                  <span id="tooltipLatency" style="color: var(--emerald);">0.8s (Instant)</span>
+                </div>
+                <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: var(--radius-sm); border-left: 3px solid var(--cyan); margin-top: 4px;">
+                  <div style="font-size: 10.5px; color: var(--text-muted);">Latest Ingested Lead:</div>
+                  <div id="tooltipLatestMsg" style="font-size: 11.5px; color: var(--text-pure); margin-top: 2px;">
+                    "Contract signed, calendar invite confirmed."
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Origin Regional Breakdown Leaderboard Grid -->
+          <div style="font-weight: 800; font-size: 14px; color: var(--text-pure); display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+            <span>🏆 Top Regional Traffic & Conversion Hubs</span>
+            <span style="font-size: 11.5px; color: var(--text-muted);">Click any country card to focus map beacon</span>
+          </div>
+          <div class="geo-stats-grid" id="geoLeaderboardGrid">
+            <!-- 1. India -->
+            <div class="geo-country-card" onclick="showHubDetails('in')">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 13.5px;">🇮🇳 India (HQ)</span>
+                <span class="badge-kpi badge-emerald">178 msgs</span>
+              </div>
+              <div class="geo-progress-bar">
+                <div class="geo-progress-fill" style="width: 100%;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                <span>Insta: 84 • Gmail: 72</span>
+                <span style="color: var(--emerald);">🔥 High HQ Volume</span>
+              </div>
+            </div>
+
+            <!-- 2. USA -->
+            <div class="geo-country-card" onclick="showHubDetails('us')">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 13.5px;">🇺🇸 United States</span>
+                <span class="badge-kpi badge-cyan">94 msgs</span>
+              </div>
+              <div class="geo-progress-bar">
+                <div class="geo-progress-fill" style="width: 53%;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                <span>Gmail: 56 • Insta: 28</span>
+                <span style="color: var(--cyan);">⚡ Brand Deals</span>
+              </div>
+            </div>
+
+            <!-- 3. UK -->
+            <div class="geo-country-card" onclick="showHubDetails('uk')">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 13.5px;">🇬🇧 United Kingdom</span>
+                <span class="badge-kpi badge-purple">48 msgs</span>
+              </div>
+              <div class="geo-progress-bar">
+                <div class="geo-progress-fill" style="width: 27%;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                <span>Gmail: 24 • Insta: 18</span>
+                <span style="color: #c084fc;">📅 Meeting Set</span>
+              </div>
+            </div>
+
+            <!-- 4. UAE -->
+            <div class="geo-country-card" onclick="showHubDetails('ae')">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 13.5px;">🇦🇪 UAE / Dubai</span>
+                <span class="badge-kpi badge-amber">42 msgs</span>
+              </div>
+              <div class="geo-progress-bar">
+                <div class="geo-progress-fill" style="width: 24%;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                <span>Insta: 22 • Gmail: 14</span>
+                <span style="color: var(--amber);">🔥 Luxury Client</span>
+              </div>
+            </div>
+
+            <!-- 5. Germany -->
+            <div class="geo-country-card" onclick="showHubDetails('de')">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 13.5px;">🇩🇪 Germany</span>
+                <span class="badge-kpi badge-cyan">31 msgs</span>
+              </div>
+              <div class="geo-progress-bar">
+                <div class="geo-progress-fill" style="width: 17%;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                <span>Gmail: 18 • Insta: 8</span>
+                <span style="color: var(--cyan);">✓ Auto-Replied</span>
+              </div>
+            </div>
+
+            <!-- 6. Singapore -->
+            <div class="geo-country-card" onclick="showHubDetails('sg')">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 13.5px;">🇸🇬 Singapore</span>
+                <span class="badge-kpi badge-emerald">26 msgs</span>
+              </div>
+              <div class="geo-progress-bar">
+                <div class="geo-progress-fill" style="width: 15%;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                <span>Insta: 12 • Gmail: 10</span>
+                <span style="color: var(--emerald);">⚡ Warm Lead</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: AI SANDBOX -->
+      <section class="tilt-card sandbox-deck" id="panelSandbox" style="display: none;">
+        <div class="feed-heading">
+          <span>🧪 "What-If" AI Sandbox Simulator</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary);">
+          Test how AI will respond to any hypothetical message before it happens live:
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" class="cmd-textarea-field" style="height: 44px;" id="sandboxPromptInput" placeholder="e.g. 'Mujhe urgent video editing karwani hai, kitna charge loge?'">
+          <button class="btn-run-directive" style="padding: 0 20px;" onclick="runSandboxSimulation()">
+            <span>⚡ Test Reply</span>
+          </button>
+        </div>
+        <div id="sandboxOutputCapsule" style="display: none;" class="autonomous-decision-capsule">
+          <div class="capsule-top">
+            <span>🤖 AI Simulated Output:</span>
+            <span style="color: var(--cyan);">Confidence: 99.8%</span>
+          </div>
+          <div class="ai-actual-reply" id="sandboxReplyOutput"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT COLUMN: COMMAND CENTER & TELEGRAM REMOTE -->
+    <aside class="cockpit-sidebar">
+
+      <!-- 1. ASSIGN DIRECTIVE TO ANY BOT -->
+      <div class="tilt-card command-deck-3d">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+            <span>🎮</span>
+            <span>Assign Task to Any Bot</span>
+          </div>
+          <span class="badge-kpi badge-emerald">● Online</span>
+        </div>
+
+        <div class="cmd-input-container">
+          <textarea class="cmd-textarea-field" id="directiveInput" placeholder="Type or click voice: 'Gmail bot: Kal ke clients ko follow up emails bhej do'"></textarea>
+          <button class="mic-voice-button" onclick="startVoiceRecognition()" title="Voice Command">
+            <span>🎤</span>
+          </button>
+        </div>
+
+        <button class="btn-run-directive" onclick="dispatchBotDirective()">
+          <span>⚡ Execute AI Task</span>
+        </button>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Presets:</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <button class="filter-chip" onclick="fillDirective('Gmail bot: Send polite meeting reminders to pending leads')">📧 Gmail Follow-ups</button>
+            <button class="filter-chip" onclick="fillDirective('Insta bot: Create weekly engagement & DM inquiry report')">📸 Insta Summary</button>
+            <button class="filter-chip" onclick="fillDirective('Website bot: Scan pending payments and notify on WhatsApp')">🌐 Web Order Check</button>
+          </div>
+        </div>
+
+        <!-- REALTIME LOGS -->
+        <div style="background: #030610; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px; font-family: var(--font-mono); font-size: 11px; color: #38bdf8; max-height: 120px; overflow-y: auto;" id="sidebarTerminalLogs">
+          <div><span style="color:#64748b;">[18:50]</span> ✓ Obikul Cloud Node Online (Free Tier).</div>
+          <div><span style="color:#64748b;">[18:51]</span> ✓ Auto-replied to Rajesh Sharma (Gmail).</div>
+          <div><span style="color:#64748b;">[18:52]</span> ✓ Sent rate card to @kavita_creations (Insta).</div>
+        </div>
+      </div>
+
+      <!-- 2. TELEGRAM REMOTE CHAT SIMULATOR -->
+      <div class="tilt-card telegram-mockup-card">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-weight: 800; font-size: 13.5px; display: flex; align-items: center; gap: 6px;">
+            <span>✈️</span>
+            <span>Telegram Secret Remote</span>
+          </div>
+          <span style="font-size: 11px; color: var(--cyan);">Mobile Control</span>
+        </div>
+        <p style="font-size: 11.5px; color: var(--text-secondary);">
+          Control your cloud server from your phone via Telegram bot:
+        </p>
+        <div class="tg-conversation">
+          <div class="tg-bubble-user">/status</div>
+          <div class="tg-bubble-bot">
+            🟢 <strong>Obi Executive Bot:</strong><br>
+            All 4 channels active.<br>
+            3 new deals booked.<br>
+            0 errors. 24/7 Cloud Running.
+          </div>
+          <div class="tg-bubble-user">Follow up all pending leads</div>
+          <div class="tg-bubble-bot">
+            ✓ Done! Dispatched 3 follow-ups via Gmail & Instagram.
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. CONNECTED PLATFORMS & EXPANSION -->
+      <div class="tilt-card telegram-mockup-card">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-weight: 800; font-size: 13.5px;">📡 Connected Platforms</div>
+          <span class="badge-kpi badge-emerald">4 Live</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between;"><span>✉️ Gmail API</span> <span style="color:var(--emerald);">Connected</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>📸 Instagram Graph</span> <span style="color:var(--emerald);">Connected</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>📘 Facebook Page</span> <span style="color:var(--emerald);">Connected</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>🌐 Website Webhooks</span> <span style="color:var(--emerald);">Connected</span></div>
+        </div>
+        <button class="btn-run-directive" style="background: rgba(255,255,255,0.05); color: var(--cyan); border: 1px dashed var(--cyan); font-size: 12px; padding: 8px;" onclick="openChannelModal()">
+          <span>➕ Add WhatsApp / Shopify / Any Site</span>
+        </button>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- WINDOWS 11 3D FLOATING TOAST -->
+  <div class="windows11-toast-card" id="win11Toast" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-weight: 800; font-size: 12.5px; color: var(--cyan); display: flex; align-items: center; gap: 6px;">
+        <span>💻</span>
+        <span>Windows 11 Laptop Sync • Welcome Back Obi!</span>
+      </div>
+      <button style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 16px;" onclick="closeLaptopToast()">✕</button>
+    </div>
+    <div style="font-size: 12.5px; color: white;">
+      <strong>Jab aapka Laptop OFF tha, AI ne 3 Urgent kaam poore kiye:</strong>
+    </div>
+    <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; font-size: 11.5px; color: #cbd5e1; display: flex; flex-direction: column; gap: 4px;">
+      <div>✉️ <strong>Gmail:</strong> Rajesh Sharma ki ₹50k meeting kal 3 PM confirm ki.</div>
+      <div>📸 <strong>Instagram:</strong> @kavita_creations ko rate-card bhej diya.</div>
+      <div>🌐 <strong>Website:</strong> 1 Urgent custom bot request process ki.</div>
+    </div>
+    <button class="btn-run-directive" style="padding: 6px 12px; font-size: 11px;" onclick="closeLaptopToast()">
+      <span>✓ Open Full Dashboard</span>
+    </button>
+  </div>
+
+  <!-- PROFILE & PHOTO UPLOAD MODAL -->
+  <div class="glass-modal-backdrop" id="profileEditModal" style="display: none;">
+    <div class="modal-cockpit-window">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-family: var(--font-heading); font-size: 20px; color: white;">👤 Commander Identity & Photo</h3>
+        <button style="background:transparent; border:none; color:white; font-size:20px; cursor:pointer;" onclick="closeProfileModal()">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary); display:block; margin-bottom: 6px;">Your Name:</label>
+          <input type="text" class="cmd-textarea-field" style="height: 44px;" id="inputCommanderName" value="Obikul Mia">
+        </div>
+
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary); display:block; margin-bottom: 6px;">Upload Profile Photo (Local File from PC):</label>
+          <input type="file" id="localPhotoInput" accept="image/*" style="font-size: 12px; color: var(--cyan);">
+        </div>
+
+        <div>
+          <label style="font-size: 12px; color: var(--text-secondary); display:block; margin-bottom: 6px;">Or Paste Image URL:</label>
+          <input type="text" class="cmd-textarea-field" style="height: 44px;" id="inputCommanderPhotoUrl" placeholder="https://...">
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button class="filter-chip" onclick="closeProfileModal()">Cancel</button>
+        <button class="btn-run-directive" style="padding: 8px 20px;" onclick="saveCommanderProfile()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONNECT CHANNEL MODAL -->
+  <div class="glass-modal-backdrop" id="channelAddModal" style="display: none;">
+    <div class="modal-cockpit-window">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-family: var(--font-heading); font-size: 20px; color: white;">➕ Connect Any Website / Channel</h3>
+        <button style="background:transparent; border:none; color:white; font-size:20px; cursor:pointer;" onclick="closeChannelModal()">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-secondary);">
+        Choose any platform to integrate into your 24/7 AI Brain:
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="lead-deal-card" style="cursor: pointer;" onclick="confirmChannelAdd('WhatsApp Cloud API')">
+          <strong style="color: #4ade80;">💬 WhatsApp Business</strong>
+          <span style="font-size: 11px; color: var(--text-muted);">24/7 Auto replies on WhatsApp</span>
+        </div>
+        <div class="lead-deal-card" style="cursor: pointer;" onclick="confirmChannelAdd('Shopify Store')">
+          <strong style="color: #93c5fd;">🛍️ Shopify Store</strong>
+          <span style="font-size: 11px; color: var(--text-muted);">Order tracking & auto support</span>
+        </div>
+        <div class="lead-deal-card" style="cursor: pointer;" onclick="confirmChannelAdd('Custom Webhook Form')">
+          <strong style="color: #34d399;">🌐 Any Website Form</strong>
+          <span style="font-size: 11px; color: var(--text-muted);">WordPress or Custom Backend</span>
+        </div>
+        <div class="lead-deal-card" style="cursor: pointer;" onclick="confirmChannelAdd('Telegram Channel')">
+          <strong style="color: #38bdf8;">✈️ Telegram Bot</strong>
+          <span style="font-size: 11px; color: var(--text-muted);">Community bot & admin alerts</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. MOBILE BOTTOM NAVIGATION DOCK (Glassmorphic Smartphone Native Dock) -->
+  <nav class="mobile-bottom-dock" id="mobileBottomDock">
+    <button class="dock-btn active" id="dockBtnFeed" onclick="activateTab('feed', this); triggerHaptic(30);">
+      <span class="dock-icon">⚡</span>
+      <span>Feed</span>
+    </button>
+    <button class="dock-btn" id="dockBtnKanban" onclick="activateTab('kanban', this); triggerHaptic(30);">
+      <span class="dock-icon">📌</span>
+      <span>CRM</span>
+    </button>
+    <button class="dock-btn" id="dockBtnKnowledge" onclick="activateTab('knowledge', this); triggerHaptic(30);">
+      <span class="dock-icon">🧠</span>
+      <span>Brain</span>
+    </button>
+    <button class="dock-btn" id="dockBtnAnalytics" onclick="activateTab('analytics', this); triggerHaptic(30);">
+      <span class="dock-icon">🗺️</span>
+      <span>Radar</span>
+    </button>
+    <button class="dock-btn" id="dockBtnSandbox" onclick="activateTab('sandbox', this); triggerHaptic(30);">
+      <span class="dock-icon">🧪</span>
+      <span>Test</span>
+    </button>
+  </nav>
+
+  <!-- 6. PWA MOBILE APP INSTALL MODAL -->
+  <div class="glass-modal-backdrop" id="mobileAppModal" style="display: none;">
+    <div class="modal-cockpit-window" style="max-width: 620px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(16, 185, 129, 0.2)); border: 1px solid var(--cyan); display: flex; align-items: center; justify-content: center; font-size: 22px;">📱</div>
+          <div>
+            <h3 style="font-family: var(--font-heading); font-size: 19px; color: white; margin: 0;">Obikul AI Mobile App</h3>
+            <span style="font-size: 12px; color: var(--cyan); font-family: var(--font-mono);">PWA & Native Standalone Cockpit</span>
+          </div>
+        </div>
+        <button style="background:transparent; border:none; color:white; font-size:22px; cursor:pointer; padding: 4px 8px;" onclick="closeMobileAppModal()">✕</button>
+      </div>
+
+      <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+        Commander, aap is AI Command Center ko apne mobile phone par direct ek <strong>High-Performance Native App</strong> ki tarah install karke 24/7 manage kar sakte hain:
+      </p>
+
+      <!-- 3 PLATFORM INSTALL TILES -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+
+        <!-- ANDROID / CHROME 1-TAP INSTALL -->
+        <div class="pwa-step-card" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.06);">
+          <div class="pwa-step-icon" style="background: rgba(16, 185, 129, 0.2); border-color: var(--emerald); color: var(--emerald);">🤖</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 800; font-size: 14px; color: white; display: flex; align-items: center; gap: 8px;">
+              <span>Android Smartphone (1-Click Install)</span>
+              <span class="badge-kpi badge-emerald">Instant</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px;">
+              Direct home-screen app with real-time push alerts, tactile haptic vibration & offline caching.
+            </div>
+          </div>
+          <button class="btn-run-directive" id="btnPwaPromptInstall" style="padding: 9px 18px; font-size: 12px;" onclick="triggerPwaInstall()">
+            <span>📲 Install Now</span>
+          </button>
+        </div>
+
+        <!-- IPHONE / IPAD (IOS SAFARI) -->
+        <div class="pwa-step-card">
+          <div class="pwa-step-icon" style="background: rgba(0, 242, 254, 0.15); border-color: var(--cyan); color: var(--cyan);">🍏</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 800; font-size: 14px; color: white;">iPhone / iPad (iOS Safari)</div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px;">
+              Safari browser me <strong>Share icon (📤)</strong> dabayein &rarr; <strong>"Add to Home Screen ➕"</strong> select karein.
+            </div>
+          </div>
+          <span class="badge-kpi badge-cyan">Add to Home</span>
+        </div>
+
+        <!-- NATIVE APK / CAPACITOR EXPORT -->
+        <div class="pwa-step-card">
+          <div class="pwa-step-icon" style="background: rgba(168, 85, 247, 0.15); border-color: var(--purple); color: var(--purple);">📦</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 800; font-size: 14px; color: white;">Android APK Package (.apk)</div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px;">
+              <code>capacitor.config.json</code> ready for direct standalone APK build with full Android hardware integration.
+            </div>
+          </div>
+          <span class="badge-kpi badge-purple">APK Configured</span>
+        </div>
+      </div>
+
+      <!-- SCAN VIA PHONE QR / NETWORK URL -->
+      <div style="background: rgba(3, 7, 18, 0.85); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <div>
+          <div style="font-size: 12.5px; font-weight: 700; color: var(--cyan);">🌐 Mobile View Simulation:</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
+            Test mobile smartphone cockpit directly in your browser.
+          </div>
+        </div>
+        <button class="filter-chip" onclick="toggleMobileDeviceView(); closeMobileAppModal();" style="border-color: var(--cyan); color: var(--cyan); padding: 6px 14px;">
+          <span>📱 Toggle Mobile Frame</span>
+        </button>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
+        <button class="btn-run-directive" style="padding: 9px 26px; font-size: 13px;" onclick="closeMobileAppModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎙️ ELEVENLABS & VOICE AI STUDIO MODAL -->
+  <div class="glass-modal-backdrop" id="voiceConfigModal" style="display: none;">
+    <div class="modal-cockpit-window" style="max-width: 640px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(168, 85, 247, 0.35); padding-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #a855f7, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 15px rgba(168,85,247,0.5);">🎙️</div>
+          <div>
+            <h3 style="font-family: var(--font-heading); font-size: 19px; color: white; margin: 0;">ElevenLabs Voice AI Studio</h3>
+            <span style="font-size: 11px; color: #c084fc; font-weight: 600;">Ultra-Realistic Studio Audio & Voice Cloning for Commander Obikul</span>
+          </div>
+        </div>
+        <button style="background:transparent; border:none; color:#94a3b8; font-size:22px; cursor:pointer; padding: 4px 8px;" onclick="closeVoiceConfigModal()">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; max-height: 62vh; overflow-y: auto; padding-right: 4px;">
+        <!-- ENGINE SELECTOR -->
+        <div>
+          <label style="font-size: 12px; font-weight: 800; color: var(--text-secondary); display:block; margin-bottom: 6px; letter-spacing: 0.04em;">VOICE SYNTHESIS ENGINE:</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div id="engineCardEleven" class="lead-deal-card" style="cursor: pointer; border: 1.5px solid #a855f7; background: rgba(168, 85, 247, 0.15);" onclick="selectVoiceEngine('elevenlabs')">
+              <div style="font-weight: 800; font-size: 13px; color: #c084fc; display: flex; align-items: center; justify-content: space-between;">
+                <span>👑 ElevenLabs AI</span>
+                <span id="badgeEleven" style="font-size: 9px; background: #a855f7; color: white; padding: 2px 6px; border-radius: 10px;">ACTIVE</span>
+              </div>
+              <span style="font-size: 11px; color: #cbd5e1; margin-top: 4px; display: block;">Human breathing, emotional inflection, 100% natural studio voice.</span>
+            </div>
+            <div id="engineCardBrowser" class="lead-deal-card" style="cursor: pointer; border: 1px solid var(--border-subtle); background: rgba(255,255,255,0.02);" onclick="selectVoiceEngine('browser')">
+              <div style="font-weight: 800; font-size: 13px; color: var(--cyan); display: flex; align-items: center; justify-content: space-between;">
+                <span>🌐 Browser Speech</span>
+                <span id="badgeBrowser" style="font-size: 9px; background: var(--cyan); color: black; padding: 2px 6px; border-radius: 10px; display: none;">ACTIVE</span>
+              </div>
+              <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">Instant built-in neural speech synthesis, 100% offline & free.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ELEVENLABS API KEY -->
+        <div id="elevenApiKeySection">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="font-size: 12px; font-weight: 800; color: var(--text-secondary); letter-spacing: 0.04em;">ELEVENLABS API KEY:</label>
+            <a href="https://elevenlabs.io" target="_blank" style="font-size: 11px; color: var(--cyan); text-decoration: none; font-weight: 700;">Get Free Key from ElevenLabs.io ↗</a>
+          </div>
+          <div style="position: relative;">
+            <input type="password" class="cmd-textarea-field" style="height: 42px; padding-right: 70px; font-family: monospace; font-size: 12px;" id="inputElevenApiKey" placeholder="xi-api-key (e.g. sk_... or 8a7f...)">
+            <button type="button" onclick="toggleApiKeyVisibility()" id="btnToggleKeyVis" style="position: absolute; right: 8px; top: 8px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-subtle); color: #cbd5e1; font-size: 11px; padding: 4px 8px; border-radius: 6px; cursor: pointer;">Show</button>
+          </div>
+          <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 4px;">🔒 Stored securely in your browser's private `localStorage`. Zero cloud leakage.</span>
+        </div>
+
+        <!-- VOICE PRESETS SELECTION (TONY STARK J.A.R.V.I.S. & CASUAL HUMAN PERSONAS) -->
+        <div id="elevenVoicePresetSection">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="font-size: 12px; font-weight: 800; color: var(--text-secondary); letter-spacing: 0.04em;">CHOOSE VOICE PERSONA:</label>
+            <span style="font-size: 11px; color: #a855f7; font-weight: 700;">🇬🇧 British J.A.R.V.I.S. Default</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <!-- JARVIS GEORGE (AUTHENTIC TONY STARK BRITISH AI) -->
+            <div class="lead-deal-card voice-card" id="vcard_JBFqnCBsd6RMkjVDRZzb" onclick="selectElevenVoicePreset('JBFqnCBsd6RMkjVDRZzb', 'George (Tony Stark J.A.R.V.I.S. - British AI)')" style="cursor: pointer; border: 1.5px solid #a855f7; background: rgba(168,85,247,0.15);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #c084fc; font-size: 12px;">🤖 J.A.R.V.I.S. (George)</strong>
+                <span style="font-size: 8.5px; background: #a855f7; color: white; padding: 1px 5px; border-radius: 6px; font-weight: 800;">IRON MAN</span>
+              </div>
+              <span style="font-size: 10.5px; color: #e2e8f0; display: block; margin-top: 2px;">Authentic British butler, witty, relaxed, Paul Bettany tone</span>
+            </div>
+
+            <!-- DANIEL (DEEP BRITISH JARVIS) -->
+            <div class="lead-deal-card voice-card" id="vcard_onwK4e9ZLuTAKqWW03F9" onclick="selectElevenVoicePreset('onwK4e9ZLuTAKqWW03F9', 'Daniel (Deep British J.A.R.V.I.S.)')" style="cursor: pointer;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #60a5fa; font-size: 12px;">🎙️ Daniel (J.A.R.V.I.S.)</strong>
+                <span style="font-size: 8.5px; background: rgba(59,130,246,0.3); color: #93c5fd; padding: 1px 5px; border-radius: 6px;">BRITISH</span>
+              </div>
+              <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 2px;">Deep, authoritative British executive butler</span>
+            </div>
+
+            <!-- BRIAN (CASUAL BRITISH HUMAN) -->
+            <div class="lead-deal-card voice-card" id="vcard_nPczCjzI2devNBz1zQrb" onclick="selectElevenVoicePreset('nPczCjzI2devNBz1zQrb', 'Brian (Casual British Human)')" style="cursor: pointer;">
+              <strong style="color: #38bdf8; font-size: 12px;">☕ Brian</strong>
+              <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 2px;">Natural, conversational human storytelling cadence</span>
+            </div>
+
+            <!-- CHRIS (CASUAL CONVERSATIONAL GUY) -->
+            <div class="lead-deal-card voice-card" id="vcard_iP95p4xoKVk53GoZ742B" onclick="selectElevenVoicePreset('iP95p4xoKVk53GoZ742B', 'Chris (Casual Human Conversational)')" style="cursor: pointer;">
+              <strong style="color: #34d399; font-size: 12px;">🗣️ Chris</strong>
+              <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 2px;">Ultra-casual, natural friend-like conversational tone</span>
+            </div>
+
+            <!-- ADAM (AMERICAN TECH EXECUTIVE) -->
+            <div class="lead-deal-card voice-card" id="vcard_pNInz6obpgDQGcFmaJgB" onclick="selectElevenVoicePreset('pNInz6obpgDQGcFmaJgB', 'Adam (American Tech Executive)')" style="cursor: pointer;">
+              <strong style="color: #94a3b8; font-size: 12px;">⚡ Adam</strong>
+              <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 2px;">Deep American executive male</span>
+            </div>
+
+            <!-- RACHEL (FRIDAY FEMALE AI) -->
+            <div class="lead-deal-card voice-card" id="vcard_21m00Tcm4TlvDq8ikWAM" onclick="selectElevenVoicePreset('21m00Tcm4TlvDq8ikWAM', 'Rachel (F.R.I.D.A.Y. Female AI)')" style="cursor: pointer;">
+              <strong style="color: #f472b6; font-size: 12px;">✨ Rachel (F.R.I.D.A.Y.)</strong>
+              <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 2px;">Calm, intelligent executive female AI</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CUSTOM VOICE CLONE ID -->
+        <div id="elevenCustomVoiceSection">
+          <label style="font-size: 12px; font-weight: 800; color: var(--text-secondary); display:block; margin-bottom: 6px; letter-spacing: 0.04em;">OR ENTER CUSTOM VOICE CLONE ID (Commander's Own Voice):</label>
+          <input type="text" class="cmd-textarea-field" style="height: 40px; font-family: monospace; font-size: 12px;" id="inputElevenVoiceId" value="JBFqnCBsd6RMkjVDRZzb" placeholder="Voice ID (e.g. JBFqnCBsd6RMkjVDRZzb)">
+          <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 4px;">Active Persona: <strong id="selectedVoiceNameDisplay" style="color: #c084fc;">George (Tony Stark J.A.R.V.I.S. - British AI)</strong></span>
+        </div>
+
+        <!-- HUMAN REALISM FINE-TUNING SLIDERS -->
+        <div style="background: rgba(14, 20, 36, 0.6); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11.5px; font-weight: 700; color: #cbd5e1;">🎙️ Conversational Human Cadence:</span>
+            <span style="font-size: 10.5px; color: #34d399; font-weight: 800;">⚡ Casual Human Mode Active</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px;">
+            <div>
+              <div style="display: flex; justify-content: space-between; color: var(--text-muted); margin-bottom: 3px;">
+                <span>Inflection Stability:</span>
+                <span id="valStabilityDisp" style="color: var(--cyan); font-weight: 700;">38% (Dynamic)</span>
+              </div>
+              <input type="range" id="sliderStability" min="15" max="80" value="38" oninput="document.getElementById('valStabilityDisp').textContent = this.value + '% (Dynamic)'" style="width: 100%; accent-color: #a855f7; cursor: pointer;">
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; color: var(--text-muted); margin-bottom: 3px;">
+                <span>Casual Style Warmth:</span>
+                <span id="valStyleDisp" style="color: #c084fc; font-weight: 700;">35% (Natural)</span>
+              </div>
+              <input type="range" id="sliderStyle" min="0" max="60" value="35" oninput="document.getElementById('valStyleDisp').textContent = this.value + '% (Natural)'" style="width: 100%; accent-color: #00f2fe; cursor: pointer;">
+            </div>
+          </div>
+        </div>
+
+        <!-- MODEL SELECTION -->
+        <div>
+          <label style="font-size: 12px; font-weight: 800; color: var(--text-secondary); display:block; margin-bottom: 6px; letter-spacing: 0.04em;">NEURAL MODEL:</label>
+          <select id="selectElevenModel" class="cmd-textarea-field" style="height: 40px; padding: 6px 10px; font-size: 12px; background: rgba(14, 20, 36, 0.95); color: white;">
+            <option value="eleven_multilingual_v2" selected>eleven_multilingual_v2 (Recommended: Best Quality + English/Hindi/Urdu accents)</option>
+            <option value="eleven_turbo_v2_5">eleven_turbo_v2_5 (Ultra-Fast 300ms Low Latency)</option>
+            <option value="eleven_monolingual_v1">eleven_monolingual_v1 (Standard English)</option>
+          </select>
+        </div>
+
+        <!-- LIVE PREVIEW AUDIO TEST -->
+        <div id="voicePreviewBox" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="previewAudioIcon" style="font-size: 22px;">🎧</span>
+            <div>
+              <div style="font-size: 12.5px; font-weight: 800; color: white;">Voice Preview Synthesizer</div>
+              <div id="previewStatusText" style="font-size: 11px; color: var(--text-muted);">Click button to test live audio sample.</div>
+            </div>
+          </div>
+          <button class="filter-chip" onclick="testElevenLabsVoiceSample()" id="btnTestVoice" style="background: rgba(168, 85, 247, 0.25); color: #e9d5ff; border-color: #a855f7; font-weight: 800; padding: 7px 14px; white-space: nowrap;">
+            <span>▶️ Test Audio</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 4px;">
+        <button class="filter-chip" onclick="closeVoiceConfigModal()">Cancel</button>
+        <button class="btn-run-directive" style="background: linear-gradient(135deg, #a855f7, #6366f1); border: 1px solid #c084fc; padding: 9px 24px;" onclick="saveVoiceSettings()">
+          <span>💾 Save Voice Configuration</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let isFullAuto = true;
+  let isPanicActive = false;
+  let isMobileViewActive = false;
+  let chartInstance = null;
+  let deferredPrompt = null;
+
+  // 0. SERVICE WORKER & PWA MOBILE ENGINE
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('[PWA] Service Worker Registered successfully:', reg.scope))
+        .catch(err => console.warn('[PWA] Service Worker registration note:', err));
+    });
+  }
+
+  // Intercept beforeinstallprompt for Android 1-click install
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const pwaBtn = document.getElementById('btnPwaPromptInstall');
+    if (pwaBtn) {
+      pwaBtn.innerHTML = '<span>⚡ Tap to Install App</span>';
+      pwaBtn.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.6)';
+    }
+  });
+
+  function triggerPwaInstall() {
+    triggerHaptic(50);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('[PWA] User accepted install prompt');
+          alert('🚀 Obikul AI Command Center installed to your home screen!');
+          addTerminalLog('PWA Installed on mobile device.');
+        }
+        deferredPrompt = null;
+        closeMobileAppModal();
+      });
+    } else {
+      alert('ℹ️ Direct Install: Browser ke top menu (⋮) me jakar "Install App" ya "Add to Home Screen" par click karein.');
+    }
+  }
+
+  function openMobileAppModal() {
+    playBeep(700, 0.08);
+    triggerHaptic(30);
+    const modal = document.getElementById('mobileAppModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeMobileAppModal() {
+    playBeep(450, 0.05);
+    const modal = document.getElementById('mobileAppModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  // Mobile Haptic Vibration feedback
+  function triggerHaptic(duration = 25) {
+    if ('vibrate' in navigator) {
+      try { navigator.vibrate(duration); } catch(e){}
+    }
+  }
+
+  // 1. SOUND EFFECTS SYNTHESIZER (Web Audio API)
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playBeep(freq = 600, duration = 0.08, type = 'sine') {
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch(e){}
+  }
+
+  // 2. 3D PARTICLE NEURAL CANVAS
+  const canvas = document.getElementById('neuralCanvas');
+  const ctx = canvas.getContext('2d');
+  let width, height, nodes = [];
+
+  function initCanvas() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    nodes = [];
+    for (let i = 0; i < 55; i++) {
+      nodes.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        radius: Math.random() * 2 + 1
+      });
+    }
+  }
+  window.addEventListener('resize', initCanvas);
+  initCanvas();
+
+  function renderNodes() {
+    ctx.clearRect(0, 0, width, height);
+    for (let i = 0; i < nodes.length; i++) {
+      const a = nodes[i];
+      a.x += a.vx;
+      a.y += a.vy;
+      if (a.x < 0) a.x = width;
+      if (a.x > width) a.x = 0;
+      if (a.y < 0) a.y = height;
+      if (a.y > height) a.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, a.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 242, 254, 0.4)';
+      ctx.fill();
+
+      for (let j = i + 1; j < nodes.length; j++) {
+        const b = nodes[j];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(0, 242, 254, ${0.15 * (1 - dist / 120)})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(renderNodes);
+  }
+  renderNodes();
+
+  // 3. VOICE ENGINE & ELEVENLABS STUDIO SETTINGS
+  const DEFAULT_ELEVEN_KEY = '';
+  let selectedVoiceEngine = 'elevenlabs';
+  let selectedVoiceId = 'JBFqnCBsd6RMkjVDRZzb'; // Default: George (Tony Stark J.A.R.V.I.S. British AI)
+  let selectedVoiceName = 'George (Tony Stark J.A.R.V.I.S. - British AI)';
+  let selectedVoiceModel = 'eleven_multilingual_v2';
+  let activeAudioPlayer = null;
+
+  function openVoiceConfigModal() {
+    triggerHaptic(20);
+    loadVoiceSettings();
+    document.getElementById('voiceConfigModal').style.display = 'flex';
+  }
+
+  function closeVoiceConfigModal() {
+    if (activeAudioPlayer) {
+      activeAudioPlayer.pause();
+      activeAudioPlayer = null;
+    }
+    document.getElementById('voiceConfigModal').style.display = 'none';
+  }
+
+  function selectVoiceEngine(engine) {
+    selectedVoiceEngine = engine;
+    const cardEleven = document.getElementById('engineCardEleven');
+    const cardBrowser = document.getElementById('engineCardBrowser');
+    const badgeEleven = document.getElementById('badgeEleven');
+    const badgeBrowser = document.getElementById('badgeBrowser');
+
+    if (engine === 'elevenlabs') {
+      if (cardEleven) {
+        cardEleven.style.border = '1.5px solid #a855f7';
+        cardEleven.style.background = 'rgba(168, 85, 247, 0.15)';
+      }
+      if (cardBrowser) {
+        cardBrowser.style.border = '1px solid var(--border-subtle)';
+        cardBrowser.style.background = 'rgba(255,255,255,0.02)';
+      }
+      if (badgeEleven) badgeEleven.style.display = 'inline-block';
+      if (badgeBrowser) badgeBrowser.style.display = 'none';
+      const keySec = document.getElementById('elevenApiKeySection');
+      const presSec = document.getElementById('elevenVoicePresetSection');
+      const custSec = document.getElementById('elevenCustomVoiceSection');
+      if (keySec) keySec.style.display = 'block';
+      if (presSec) presSec.style.display = 'block';
+      if (custSec) custSec.style.display = 'block';
+    } else {
+      if (cardBrowser) {
+        cardBrowser.style.border = '1.5px solid var(--cyan)';
+        cardBrowser.style.background = 'rgba(0, 242, 254, 0.15)';
+      }
+      if (cardEleven) {
+        cardEleven.style.border = '1px solid var(--border-subtle)';
+        cardEleven.style.background = 'rgba(255,255,255,0.02)';
+      }
+      if (badgeBrowser) badgeBrowser.style.display = 'inline-block';
+      if (badgeEleven) badgeEleven.style.display = 'none';
+    }
+    playBeep(700, 0.08);
+  }
+
+  function selectElevenVoicePreset(voiceId, voiceName) {
+    selectedVoiceId = voiceId;
+    selectedVoiceName = voiceName;
+    const inpVoice = document.getElementById('inputElevenVoiceId');
+    if (inpVoice) inpVoice.value = voiceId;
+    const nameDisp = document.getElementById('selectedVoiceNameDisplay');
+    if (nameDisp) nameDisp.textContent = voiceName;
+
+    document.querySelectorAll('.voice-card').forEach(card => {
+      card.style.borderColor = 'var(--border-subtle)';
+      card.style.background = 'rgba(255,255,255,0.02)';
+    });
+    const activeCard = document.getElementById(`vcard_${voiceId}`);
+    if (activeCard) {
+      activeCard.style.borderColor = '#a855f7';
+      activeCard.style.background = 'rgba(168, 85, 247, 0.15)';
+    }
+    playBeep(820, 0.08);
+  }
+
+  function toggleApiKeyVisibility() {
+    const inp = document.getElementById('inputElevenApiKey');
+    const btn = document.getElementById('btnToggleKeyVis');
+    if (!inp) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      if (btn) btn.textContent = 'Hide';
+    } else {
+      inp.type = 'password';
+      if (btn) btn.textContent = 'Show';
+    }
+  }
+
+  function saveVoiceSettings() {
+    const key = document.getElementById('inputElevenApiKey')?.value.trim() || DEFAULT_ELEVEN_KEY;
+    const voiceId = document.getElementById('inputElevenVoiceId')?.value.trim() || 'JBFqnCBsd6RMkjVDRZzb';
+    const model = document.getElementById('selectElevenModel')?.value || 'eleven_multilingual_v2';
+    const stabilityVal = (parseFloat(document.getElementById('sliderStability')?.value) || 38) / 100;
+    const styleVal = (parseFloat(document.getElementById('sliderStyle')?.value) || 35) / 100;
+
+    try {
+      localStorage.setItem('obikul_voice_engine', selectedVoiceEngine);
+      localStorage.setItem('obikul_elevenlabs_key', key);
+      localStorage.setItem('obikul_elevenlabs_voice_id', voiceId);
+      localStorage.setItem('obikul_elevenlabs_voice_name', selectedVoiceName);
+      localStorage.setItem('obikul_elevenlabs_model', model);
+      localStorage.setItem('obikul_elevenlabs_stability', stabilityVal);
+      localStorage.setItem('obikul_elevenlabs_style', styleVal);
+    } catch(e) {}
+
+    addTerminalLog(`🎙️ Voice Engine updated: ${selectedVoiceEngine === 'elevenlabs' ? 'ElevenLabs AI (' + selectedVoiceName + ')' : 'Browser Speech'}`);
+    closeVoiceConfigModal();
+    playBeep(900, 0.12);
+  }
+
+  function loadVoiceSettings() {
+    try {
+      const savedEngine = localStorage.getItem('obikul_voice_engine') || 'elevenlabs';
+      const savedKey = localStorage.getItem('obikul_elevenlabs_key') || DEFAULT_ELEVEN_KEY;
+      const savedVoiceId = localStorage.getItem('obikul_elevenlabs_voice_id') || 'JBFqnCBsd6RMkjVDRZzb';
+      const savedVoiceName = localStorage.getItem('obikul_elevenlabs_voice_name') || 'George (Tony Stark J.A.R.V.I.S. - British AI)';
+      const savedModel = localStorage.getItem('obikul_elevenlabs_model') || 'eleven_multilingual_v2';
+      const savedStability = localStorage.getItem('obikul_elevenlabs_stability') || '0.38';
+      const savedStyle = localStorage.getItem('obikul_elevenlabs_style') || '0.35';
+
+      selectedVoiceEngine = savedEngine;
+      selectedVoiceId = savedVoiceId;
+      selectedVoiceName = savedVoiceName;
+      selectedVoiceModel = savedModel;
+
+      const inpKey = document.getElementById('inputElevenApiKey');
+      if (inpKey) inpKey.value = savedKey;
+
+      const inpVoice = document.getElementById('inputElevenVoiceId');
+      if (inpVoice) inpVoice.value = savedVoiceId;
+
+      const nameDisp = document.getElementById('selectedVoiceNameDisplay');
+      if (nameDisp) nameDisp.textContent = savedVoiceName;
+
+      const selModel = document.getElementById('selectElevenModel');
+      if (selModel) selModel.value = savedModel;
+
+      const sStab = document.getElementById('sliderStability');
+      const sStyl = document.getElementById('sliderStyle');
+      const vStabDisp = document.getElementById('valStabilityDisp');
+      const vStylDisp = document.getElementById('valStyleDisp');
+      if (sStab) {
+        sStab.value = Math.round(parseFloat(savedStability) * 100);
+        if (vStabDisp) vStabDisp.textContent = `${sStab.value}% (Dynamic)`;
+      }
+      if (sStyl) {
+        sStyl.value = Math.round(parseFloat(savedStyle) * 100);
+        if (vStylDisp) vStylDisp.textContent = `${sStyl.value}% (Natural)`;
+      }
+
+      selectVoiceEngine(savedEngine);
+      selectElevenVoicePreset(savedVoiceId, savedVoiceName);
+
+      if (!localStorage.getItem('obikul_elevenlabs_key')) {
+        localStorage.setItem('obikul_elevenlabs_key', DEFAULT_ELEVEN_KEY);
+        localStorage.setItem('obikul_voice_engine', 'elevenlabs');
+        localStorage.setItem('obikul_elevenlabs_voice_id', 'JBFqnCBsd6RMkjVDRZzb');
+        localStorage.setItem('obikul_elevenlabs_voice_name', 'George (Tony Stark J.A.R.V.I.S. - British AI)');
+        localStorage.setItem('obikul_elevenlabs_model', 'eleven_multilingual_v2');
+        localStorage.setItem('obikul_elevenlabs_stability', '0.38');
+        localStorage.setItem('obikul_elevenlabs_style', '0.35');
+      }
+    } catch(e) {}
+  }
+
+  async function testElevenLabsVoiceSample() {
+    const key = document.getElementById('inputElevenApiKey')?.value.trim() || DEFAULT_ELEVEN_KEY;
+    const voiceId = document.getElementById('inputElevenVoiceId')?.value.trim() || 'JBFqnCBsd6RMkjVDRZzb';
+    const model = document.getElementById('selectElevenModel')?.value || 'eleven_multilingual_v2';
+    const stability = (parseFloat(document.getElementById('sliderStability')?.value) || 38) / 100;
+    const style = (parseFloat(document.getElementById('sliderStyle')?.value) || 35) / 100;
+    const statusText = document.getElementById('previewStatusText');
+    const sampleText = `Good morning, boss. All systems are operating smoothly, and your 24/7 command center is fully synchronized. Ready whenever you need me.`;
+
+    if (selectedVoiceEngine === 'elevenlabs') {
+      if (statusText) {
+        statusText.textContent = '⚡ Synthesizing J.A.R.V.I.S. British audio...';
+        statusText.style.color = '#c084fc';
+      }
+      try {
+        let audioBlob = null;
+        if (key) {
+          try {
+            const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'xi-api-key': key
+              },
+              body: JSON.stringify({
+                text: sampleText,
+                model_id: model,
+                voice_settings: {
+                  stability: stability,
+                  similarity_boost: 0.82,
+                  style: style,
+                  use_speaker_boost: true
+                }
+              })
+            });
+            if (response.ok) {
+              audioBlob = await response.blob();
+            } else {
+              const errJson = await response.json().catch(() => ({}));
+              console.warn('ElevenLabs API returned:', response.status, errJson);
+            }
+          } catch (directErr) {
+            console.warn('Direct fetch note, trying backend proxy:', directErr);
+          }
+        }
+
+        // Try backend proxy if direct fetch wasn't used or successful
+        if (!audioBlob) {
+          const proxyRes = await fetch('/api/voice/elevenlabs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: sampleText,
+              voiceId: voiceId,
+              apiKey: key || undefined,
+              modelId: model,
+              stability: stability,
+              similarityBoost: 0.82,
+              style: style
+            })
+          });
+          if (proxyRes.ok) {
+            audioBlob = await proxyRes.blob();
+          }
+        }
+
+        if (audioBlob) {
+          const audioUrl = URL.createObjectURL(audioBlob);
+          if (activeAudioPlayer) activeAudioPlayer.pause();
+          activeAudioPlayer = new Audio(audioUrl);
+          activeAudioPlayer.play();
+          if (statusText) {
+            statusText.textContent = '🔊 Playing J.A.R.V.I.S. (Tony Stark British AI)...';
+            statusText.style.color = '#34d399';
+          }
+          activeAudioPlayer.onended = () => {
+            if (statusText) {
+              statusText.textContent = '✅ Preview complete!';
+              statusText.style.color = 'var(--text-muted)';
+            }
+          };
+          return;
+        } else {
+          throw new Error('ElevenLabs direct synthesis unavailable');
+        }
+      } catch (err) {
+        console.warn('ElevenLabs preview fallback to Browser Speech:', err);
+        playBrowserSample(sampleText, () => {
+          if (statusText) {
+            statusText.textContent = '🔊 Playing Browser British Neural Voice...';
+            statusText.style.color = '#38bdf8';
+          }
+        }, () => {
+          if (statusText) {
+            statusText.textContent = '✅ Preview complete!';
+            statusText.style.color = 'var(--text-muted)';
+          }
+        });
+      }
+    } else {
+      if (statusText) {
+        statusText.textContent = '🌐 Playing Browser Neural Speech...';
+      }
+      playBrowserSample(sampleText, () => {
+        if (statusText) {
+          statusText.textContent = '🔊 Playing Browser Voice...';
+          statusText.style.color = '#38bdf8';
+        }
+      }, () => {
+        if (statusText) {
+          statusText.textContent = '✅ Preview complete!';
+          statusText.style.color = 'var(--text-muted)';
+        }
+      });
+    }
+  }
+
+  function getDeepExecutiveVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    // Prioritize natural deep British / executive male voices
+    const britishMale = voices.find(v =>
+      (v.lang === 'en-GB' || v.lang.startsWith('en-GB')) &&
+      (v.name.includes('George') || v.name.includes('Oliver') || v.name.includes('Male') || v.name.includes('David') || v.name.includes('Natural'))
+    );
+    if (britishMale) return britishMale;
+    const deepMale = voices.find(v =>
+      (v.name.includes('David') || v.name.includes('George') || v.name.includes('Male') || v.name.includes('Guy') || v.name.includes('Natural')) &&
+      v.lang.startsWith('en')
+    );
+    return deepMale || voices.find(v => v.lang.startsWith('en-GB')) || voices.find(v => v.lang.startsWith('en')) || voices[0] || null;
+  }
+
+  function playBrowserSample(text, onStartCb, onEndCb) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      const voice = getDeepExecutiveVoice();
+      if (voice) utter.voice = voice;
+      utter.rate = 1.0;
+      utter.pitch = 0.95; // Deep authoritative pitch
+
+      utter.onstart = () => {
+        if (onStartCb) onStartCb();
+      };
+      utter.onend = () => {
+        if (onEndCb) onEndCb();
+      };
+      utter.onerror = () => {
+        if (onEndCb) onEndCb();
+      };
+
+      window.speechSynthesis.speak(utter);
+    } else {
+      if (onEndCb) onEndCb();
+      alert("Voice Audio: " + text);
+    }
+  }
+
+  // MORNING AUDIO BRIEFING (ELEVENLABS + SPEECH SYNTHESIS)
+  async function triggerAudioBriefing(isAuto = false) {
+    if (!isAuto) playBeep(880, 0.12, 'triangle');
+    const cmdName = document.getElementById('commanderNameDisplay')?.textContent || 'Obikul Mia';
+    // Conversational, authentic Tony Stark J.A.R.V.I.S. morning intelligence briefing
+    const speechText = `Good morning, boss. Hope you had a restful sleep. While you were offline, your cloud engine handled all communications smoothly. We processed 184 inbound inquiries across Instagram, WhatsApp, and Gmail, automatically closed 142 leads with your standard rate cards, and secured over 1 Lakh 28 Thousand Rupees in high-intent deals. All neural streams are operating at 100% efficiency. Ready for today's directives, boss.`;
+    const btnText = document.getElementById('audioBtnLabel');
+    const eq = document.getElementById('audioEqualizer');
+
+    let key = DEFAULT_ELEVEN_KEY;
+    let voiceId = 'JBFqnCBsd6RMkjVDRZzb'; // Default George British J.A.R.V.I.S.
+    let model = 'eleven_multilingual_v2';
+    let engine = 'elevenlabs';
+    let stability = 0.38;
+    let style = 0.35;
+
+    try {
+      key = localStorage.getItem('obikul_elevenlabs_key') || DEFAULT_ELEVEN_KEY;
+      voiceId = localStorage.getItem('obikul_elevenlabs_voice_id') || 'JBFqnCBsd6RMkjVDRZzb';
+      model = localStorage.getItem('obikul_elevenlabs_model') || 'eleven_multilingual_v2';
+      engine = localStorage.getItem('obikul_voice_engine') || 'elevenlabs';
+      stability = parseFloat(localStorage.getItem('obikul_elevenlabs_stability')) || 0.38;
+      style = parseFloat(localStorage.getItem('obikul_elevenlabs_style')) || 0.35;
+    } catch(e) {}
+
+    // If ElevenLabs is chosen, stream Studio Audio!
+    if (engine === 'elevenlabs') {
+      if (btnText) btnText.textContent = "⚡ J.A.R.V.I.S. Synthesizing...";
+      if (eq) eq.style.display = "flex";
+      addTerminalLog("🎙️ ElevenLabs Studio Audio Synthesis initiated (J.A.R.V.I.S. - Tony Stark British AI)...");
+
+      try {
+        let audioBlob = null;
+        if (key) {
+          try {
+            const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'xi-api-key': key
+              },
+              body: JSON.stringify({
+                text: speechText,
+                model_id: model,
+                voice_settings: {
+                  stability: stability,
+                  similarity_boost: 0.82,
+                  style: style,
+                  use_speaker_boost: true
+                }
+              })
+            });
+            if (response.ok) {
+              audioBlob = await response.blob();
+            }
+          } catch(directErr) {
+            console.warn('Direct fetch note, trying backend proxy:', directErr);
+          }
+        }
+
+        // Try backend proxy if direct fetch wasn't used or available
+        if (!audioBlob) {
+          const proxyRes = await fetch('/api/voice/elevenlabs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: speechText,
+              voiceId: voiceId,
+              apiKey: key || undefined,
+              modelId: model,
+              stability: stability,
+              similarityBoost: 0.82,
+              style: style
+            })
+          });
+          if (proxyRes.ok) {
+            audioBlob = await proxyRes.blob();
+          }
+        }
+
+        if (audioBlob) {
+          const audioUrl = URL.createObjectURL(audioBlob);
+          if (activeAudioPlayer) activeAudioPlayer.pause();
+          activeAudioPlayer = new Audio(audioUrl);
+
+          if (btnText) btnText.textContent = "🔊 J.A.R.V.I.S. Speaking...";
+          addTerminalLog(`🔊 Playing authentic J.A.R.V.I.S. (Tony Stark British AI) morning briefing`);
+          activeAudioPlayer.play();
+
+          activeAudioPlayer.onended = () => {
+            if (btnText) btnText.textContent = "🎙️ Play Audio Briefing";
+            if (eq) eq.style.display = "none";
+            addTerminalLog("Briefing playback complete.");
+          };
+          return;
+        } else {
+          throw new Error('ElevenLabs audio could not be synthesized.');
+        }
+      } catch (err) {
+        console.warn('ElevenLabs fallback to Browser Speech:', err);
+        addTerminalLog("ElevenLabs fallback to Browser Neural Audio.");
+      }
+    }
+
+    // Default Browser Speech fallback
+    playBrowserSample(speechText, () => {
+      if (btnText) btnText.textContent = "🔊 AI Speaking Briefing...";
+      if (eq) eq.style.display = "flex";
+      addTerminalLog("🎙️ AI Morning Voice Briefing active: Neural speech synthesized.");
+    }, () => {
+      if (btnText) btnText.textContent = "🎙️ Play Audio Briefing";
+      if (eq) eq.style.display = "none";
+      addTerminalLog("Briefing playback complete.");
+    });
+  }
+
+  // Auto-play briefing if opened from morning push alert or query param
+  window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('briefing') === 'auto' || urlParams.get('autobrief') === '1') {
+      setTimeout(() => {
+        triggerAudioBriefing(true);
+      }, 800);
+    }
+  });
+
+  // 4. FULL AUTO MODE SWITCH
+  function toggleFullAutoMode() {
+    playBeep(isFullAuto ? 440 : 750, 0.1);
+    isFullAuto = !isFullAuto;
+    const box = document.getElementById('autoModeBox');
+    const txt = document.getElementById('modeStatusText');
+
+    if (isFullAuto) {
+      box.classList.remove('approval-mode');
+      txt.textContent = "⚡ FULL AUTO 24/7";
+      addTerminalLog("Full Auto Mode re-enabled. AI is executing actions autonomously.");
+    } else {
+      box.classList.add('approval-mode');
+      txt.textContent = "🛡️ HUMAN APPROVAL MODE";
+      addTerminalLog("Approval Mode active. Outgoing actions will require 1-click confirmation.");
+    }
+  }
+
+  // 5. PANIC FREEZE STOP
+  function togglePanicStop() {
+    isPanicActive = !isPanicActive;
+    playBeep(isPanicActive ? 300 : 800, 0.2, 'sawtooth');
+    const icon = document.getElementById('panicIcon');
+    const txt = document.getElementById('panicText');
+
+    if (isPanicActive) {
+      icon.textContent = "🔒";
+      txt.textContent = "FROZEN (Click to Resume)";
+      alert("🛑 EMERGENCY FREEZE ACTIVE: All outgoing auto-replies paused instantly.");
+      addTerminalLog("EMERGENCY KILL SWITCH ACTIVATED.");
+    } else {
+      icon.textContent = "🛑";
+      txt.textContent = "Panic Freeze";
+      alert("✅ Resumed: Bot active and running.");
+      addTerminalLog("Emergency freeze lifted.");
+    }
+  }
+
+  // 6. LAPTOP WAKEUP TOAST
+  function testLaptopWakeupAlert() {
+    playBeep(920, 0.15);
+    document.getElementById('win11Toast').style.display = 'flex';
+    addTerminalLog("Simulated Windows 11 wake-up: Pushed 3 catch-up notifications to desktop.");
+  }
+  function closeLaptopToast() {
+    document.getElementById('win11Toast').style.display = 'none';
+  }
+
+  // 7. SWITCH POWER TABS (Synchronized Desktop & Mobile Dock Navigation)
+  function activateTab(tabKey, btn) {
+    playBeep(650, 0.06);
+    triggerHaptic(25);
+
+    // Sync Desktop Tab Buttons
+    document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+    // Sync Mobile Bottom Dock Buttons
+    document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
+
+    if (btn) btn.classList.add('active');
+
+    // Cross-sync mobile dock or desktop button
+    const dockBtn = document.getElementById('dockBtn' + tabKey.charAt(0).toUpperCase() + tabKey.slice(1));
+    if (dockBtn) dockBtn.classList.add('active');
+
+    const tabIndexMap = { 'feed': 0, 'kanban': 1, 'knowledge': 2, 'analytics': 3, 'sandbox': 4 };
+    const tabBtns = document.querySelectorAll('.nav-tab-btn');
+    if (tabIndexMap[tabKey] !== undefined && tabBtns[tabIndexMap[tabKey]]) {
+      tabBtns[tabIndexMap[tabKey]].classList.add('active');
+    }
+
+    const panels = ['panelFeed', 'panelKanban', 'panelKnowledge', 'panelAnalytics', 'panelSandbox'];
+    panels.forEach(p => {
+      const el = document.getElementById(p);
+      if (el) el.style.display = 'none';
+    });
+
+    if (tabKey === 'feed') document.getElementById('panelFeed').style.display = 'flex';
+    if (tabKey === 'kanban') document.getElementById('panelKanban').style.display = 'flex';
+    if (tabKey === 'knowledge') document.getElementById('panelKnowledge').style.display = 'flex';
+    if (tabKey === 'analytics') {
+      document.getElementById('panelAnalytics').style.display = 'flex';
+      setupChart();
+    }
+    if (tabKey === 'sandbox') document.getElementById('panelSandbox').style.display = 'flex';
+  }
+
+  // 8. SETUP CHART
+  function setupChart() {
+    if (chartInstance) return;
+    const chartCtx = document.getElementById('trafficAnalyticsChart').getContext('2d');
+    chartInstance = new Chart(chartCtx, {
+      type: 'line',
+      data: {
+        labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+        datasets: [
+          {
+            label: 'Gmail Streams',
+            data: [12, 18, 5, 42, 65, 52, 38, 24],
+            borderColor: '#f87171',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: 'Instagram DMs',
+            data: [25, 14, 8, 30, 48, 70, 85, 40],
+            borderColor: '#f472b6',
+            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: 'AI Autonomous Auto-Replies',
+            data: [8, 12, 4, 35, 58, 62, 55, 30],
+            borderColor: '#00f2fe',
+            backgroundColor: 'rgba(0, 242, 254, 0.15)',
+            tension: 0.4,
+            fill: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } } }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+        }
+      }
+    });
+  }
+
+  // 9. DISPATCH DIRECTIVES
+  function dispatchBotDirective() {
+    const input = document.getElementById('directiveInput');
+    const val = input.value.trim();
+    if (!val) {
+      alert("Please enter a command for the bot!");
+      return;
+    }
+    playBeep(700, 0.1);
+    addTerminalLog(`Directive assigned: "${val}"`);
+    setTimeout(() => {
+      playBeep(950, 0.12);
+      addTerminalLog(`✓ AI Task dispatched across worker nodes. Completed.`);
+      input.value = '';
+    }, 600);
+  }
+
+  function fillDirective(txt) {
+    document.getElementById('directiveInput').value = txt;
+  }
+
+  function startVoiceRecognition() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SpeechRec();
+      rec.lang = 'hi-IN';
+      rec.start();
+      rec.onresult = (e) => {
+        document.getElementById('directiveInput').value = e.results[0][0].transcript;
+      };
+    } else {
+      const p = prompt("Voice transcription input:");
+      if (p) document.getElementById('directiveInput').value = p;
+    }
+  }
+
+  // 10. SANDBOX SIMULATOR
+  function runSandboxSimulation() {
+    const p = document.getElementById('sandboxPromptInput').value;
+    if (!p) return;
+    playBeep(800, 0.08);
+    document.getElementById('sandboxOutputCapsule').style.display = 'flex';
+    document.getElementById('sandboxReplyOutput').textContent = `"Hello! Thanks for your message. Based on our 2026 pricing guidelines, our professional services start at ₹15,000. Let's schedule a brief call: [Booking Link]"`;
+  }
+
+  // 11. PROFILE EDIT & LOCAL PHOTO UPLOAD WITH PERSISTENCE
+  function openProfileModal() {
+    document.getElementById('profileEditModal').style.display = 'flex';
+  }
+  function closeProfileModal() {
+    document.getElementById('profileEditModal').style.display = 'none';
+  }
+  function saveCommanderProfile() {
+    const name = document.getElementById('inputCommanderName').value;
+    const photoUrl = document.getElementById('inputCommanderPhotoUrl').value;
+    const fileInput = document.getElementById('localPhotoInput');
+
+    if (name) {
+      document.getElementById('commanderNameDisplay').textContent = name;
+      const initials = name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+      const initialsEl = document.getElementById('avatarInitials');
+      if (initialsEl) initialsEl.textContent = initials;
+      try {
+        localStorage.setItem('obikul_commander_name', name);
+      } catch (e) {}
+    }
+
+    if (fileInput.files && fileInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const photoData = e.target.result;
+        document.getElementById('avatarImageElem').src = photoData;
+        document.getElementById('avatarImageElem').style.display = 'block';
+        document.getElementById('avatarInitials').style.display = 'none';
+        try {
+          localStorage.setItem('obikul_commander_photo', photoData);
+        } catch (e) {}
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    } else if (photoUrl) {
+      document.getElementById('avatarImageElem').src = photoUrl;
+      document.getElementById('avatarImageElem').style.display = 'block';
+      document.getElementById('avatarInitials').style.display = 'none';
+      try {
+        localStorage.setItem('obikul_commander_photo', photoUrl);
+      } catch (e) {}
+    }
+
+    closeProfileModal();
+    playBeep(850, 0.1);
+  }
+
+  function loadCommanderProfile() {
+    try {
+      const savedName = localStorage.getItem('obikul_commander_name') || 'Obikul Mia';
+      const savedPhoto = localStorage.getItem('obikul_commander_photo');
+      if (savedName) {
+        const nameDisp = document.getElementById('commanderNameDisplay');
+        if (nameDisp) nameDisp.textContent = savedName;
+        const initials = savedName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+        const initialsEl = document.getElementById('avatarInitials');
+        if (initialsEl) initialsEl.textContent = initials;
+        const inputName = document.getElementById('inputCommanderName');
+        if (inputName) inputName.value = savedName;
+      }
+      if (savedPhoto) {
+        const imgEl = document.getElementById('avatarImageElem');
+        const initialsEl = document.getElementById('avatarInitials');
+        if (imgEl && initialsEl) {
+          imgEl.src = savedPhoto;
+          imgEl.style.display = 'block';
+          initialsEl.style.display = 'none';
+        }
+        const inputUrl = document.getElementById('inputCommanderPhotoUrl');
+        if (inputUrl && !savedPhoto.startsWith('data:')) inputUrl.value = savedPhoto;
+      }
+    } catch(e) {
+      console.warn('LocalStorage error:', e);
+    }
+  }
+
+  // Load saved profile & voice settings immediately
+  loadCommanderProfile();
+  loadVoiceSettings();
+
+  // 12. CHANNEL MODAL
+  function openChannelModal() {
+    document.getElementById('channelAddModal').style.display = 'flex';
+  }
+  function closeChannelModal() {
+    document.getElementById('channelAddModal').style.display = 'none';
+  }
+  function confirmChannelAdd(chName) {
+    playBeep(800, 0.1);
+    addTerminalLog(`Connected: ${chName}. Live listeners active.`);
+    closeChannelModal();
+    alert(`Success: ${chName} connected and monitored 24/7!`);
+  }
+
+  function simulateFileUpload() {
+    playBeep(900, 0.15);
+    alert("📁 Document Uploaded: 'Obikul_Commercial_Rate_Card_2026.pdf' successfully processed & indexed into AI Brain memory!");
+    addTerminalLog("Document ingested into AI Brain: 42 new pricing rules active.");
+  }
+
+  function toggleMobileDeviceView() {
+    isMobileViewActive = !isMobileViewActive;
+    const shell = document.getElementById('appShell');
+    const icon = document.getElementById('mobileIcon');
+    const label = document.getElementById('mobileLabel');
+
+    if (isMobileViewActive) {
+      shell.classList.add('mobile-container-frame');
+      icon.textContent = "💻";
+      label.textContent = "Desktop View";
+    } else {
+      shell.classList.remove('mobile-container-frame');
+      icon.textContent = "📱";
+      label.textContent = "Mobile View";
+    }
+  }
+
+  function filterStream(channel, btn) {
+    document.querySelectorAll('.channel-filter-chips .filter-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const cards = document.querySelectorAll('.stream-card');
+    cards.forEach(card => {
+      if (channel === 'all' || card.getAttribute('data-channel') === channel) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function addTerminalLog(msg) {
+    const logs = document.getElementById('sidebarTerminalLogs');
+    const d = new Date();
+    const time = `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const row = document.createElement('div');
+    row.innerHTML = `<span style="color:#64748b;">[${time}]</span> ✓ ${msg}`;
+    logs.appendChild(row);
+    logs.scrollTop = logs.scrollHeight;
+  }
+
+  // =========================================================================
+  // 13. LIVE GLOBAL WORLD MAP & GEO-TRACKER LOGIC
+  // =========================================================================
+  const globalHubsData = {
+    in: {
+      id: 'in',
+      name: 'India (HQ Hub - Mumbai/Delhi/BLR)',
+      flag: '🇮🇳',
+      coords: { x: 685, y: 275 },
+      totalMsgs: 178,
+      channels: { gmail: 72, insta: 84, web: 22 },
+      avgLatency: '0.8s',
+      latestMsg: 'Rajesh Sharma: Contract signed, calendar invite confirmed for 3 PM.',
+      status: '🔥 High HQ Volume',
+      statusColor: 'badge-emerald'
+    },
+    us: {
+      id: 'us',
+      name: 'United States (New York / SF)',
+      flag: '🇺🇸',
+      coords: { x: 230, y: 175 },
+      totalMsgs: 94,
+      channels: { gmail: 56, insta: 28, web: 10 },
+      avgLatency: '1.2s',
+      latestMsg: 'Apex Media USA: Q4 Brand Sponsorship pricing inquiry.',
+      status: '⚡ Active Hot Leads',
+      statusColor: 'badge-cyan'
+    },
+    uk: {
+      id: 'uk',
+      name: 'United Kingdom (London)',
+      flag: '🇬🇧',
+      coords: { x: 472, y: 140 },
+      totalMsgs: 48,
+      channels: { gmail: 24, insta: 18, web: 6 },
+      avgLatency: '1.1s',
+      latestMsg: 'London Creatives: Inquired about full video production package.',
+      status: '📅 Meeting Scheduled',
+      statusColor: 'badge-purple'
+    },
+    ae: {
+      id: 'ae',
+      name: 'UAE / Middle East (Dubai)',
+      flag: '🇦🇪',
+      coords: { x: 618, y: 250 },
+      totalMsgs: 42,
+      channels: { gmail: 14, insta: 22, web: 6 },
+      avgLatency: '0.9s',
+      latestMsg: 'Dubai RealEstate Pro: Commercial video shoot rate card requested.',
+      status: '🔥 Luxury Deal Pending',
+      statusColor: 'badge-amber'
+    },
+    de: {
+      id: 'de',
+      name: 'Germany (Berlin / Frankfurt)',
+      flag: '🇩🇪',
+      coords: { x: 510, y: 148 },
+      totalMsgs: 31,
+      channels: { gmail: 18, insta: 8, web: 5 },
+      avgLatency: '1.4s',
+      latestMsg: 'TechVentures GmbH: AI automation consulting inquiry.',
+      status: '✓ Auto-Replied',
+      statusColor: 'badge-cyan'
+    },
+    sg: {
+      id: 'sg',
+      name: 'Singapore (APAC Hub)',
+      flag: '🇸🇬',
+      coords: { x: 772, y: 335 },
+      totalMsgs: 26,
+      channels: { gmail: 10, insta: 12, web: 4 },
+      avgLatency: '1.0s',
+      latestMsg: 'SingaMedia: Partnership proposal for regional creative campaign.',
+      status: '⚡ Warm Lead',
+      statusColor: 'badge-emerald'
+    },
+    ca: {
+      id: 'ca',
+      name: 'Canada (Toronto)',
+      flag: '🇨🇦',
+      coords: { x: 245, y: 155 },
+      totalMsgs: 15,
+      channels: { gmail: 8, insta: 5, web: 2 },
+      avgLatency: '1.3s',
+      latestMsg: 'Toronto Media House: Requested portfolio and rate card sample.',
+      status: '✓ Auto-Replied',
+      statusColor: 'badge-cyan'
+    },
+    au: {
+      id: 'au',
+      name: 'Australia (Sydney)',
+      flag: '🇦🇺',
+      coords: { x: 885, y: 440 },
+      totalMsgs: 11,
+      channels: { gmail: 4, insta: 5, web: 2 },
+      avgLatency: '1.5s',
+      latestMsg: 'Sydney Visuals: Follow-up on commercial editing turnaround.',
+      status: '✓ Auto-Replied',
+      statusColor: 'badge-cyan'
+    }
+  };
+
+  let totalGlobalMessagesCount = 445;
+
+  function showHubDetails(hubKey) {
+    const hub = globalHubsData[hubKey];
+    if (!hub) return;
+
+    playBeep(750, 0.08, 'sawtooth');
+
+    document.getElementById('tooltipFlag').textContent = hub.flag;
+    document.getElementById('tooltipTitle').textContent = hub.name;
+    document.getElementById('tooltipVolume').textContent = `${hub.totalMsgs} Messages`;
+    document.getElementById('tooltipChannels').textContent = `Insta: ${hub.channels.insta} | Gmail: ${hub.channels.gmail} | Web: ${hub.channels.web}`;
+    document.getElementById('tooltipLatency').textContent = `${hub.avgLatency} (Instant AI)`;
+    document.getElementById('tooltipLatestMsg').textContent = `"${hub.latestMsg}"`;
+
+    const tooltip = document.getElementById('mapFloatingTooltip');
+    tooltip.style.display = 'block';
+
+    addTerminalLog(`Geo-Radar focused on ${hub.flag} ${hub.name}: ${hub.totalMsgs} active messages.`);
+  }
+
+  function closeMapTooltip() {
+    document.getElementById('mapFloatingTooltip').style.display = 'none';
+  }
+
+  function filterGeoMap(channelKey, btn) {
+    playBeep(650, 0.05);
+    document.querySelectorAll('.geo-header-toolbar .filter-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Update country cards highlight based on channel
+    const cards = document.querySelectorAll('.geo-country-card');
+    cards.forEach(card => {
+      card.style.opacity = '1';
+    });
+
+    addTerminalLog(`Geo-Radar filtered by channel: [${channelKey.toUpperCase()}].`);
+  }
+
+  function simulateInboundPing() {
+    const hubKeys = ['us', 'uk', 'ae', 'de', 'sg', 'ca', 'au'];
+    const randomKey = hubKeys[Math.floor(Math.random() * hubKeys.length)];
+    const hub = globalHubsData[randomKey];
+
+    // Increment counts
+    totalGlobalMessagesCount += 1;
+    hub.totalMsgs += 1;
+    hub.channels.insta += 1;
+
+    // Update DOM counts
+    document.getElementById('geoCountAll').textContent = totalGlobalMessagesCount;
+    document.getElementById('geoCountInsta').textContent = parseInt(document.getElementById('geoCountInsta').textContent) + 1;
+
+    // Trigger dual-tone high-tech ping sound
+    playBeep(920, 0.12, 'sine');
+    setTimeout(() => playBeep(1250, 0.09, 'triangle'), 80);
+
+    // Show tooltip
+    showHubDetails(randomKey);
+
+    // Flash terminal
+    addTerminalLog(`⚡ INBOUND PING DETECTED: Incoming message from ${hub.flag} ${hub.name}. AI auto-processed in ${hub.avgLatency}.`);
+  }
+</script>
