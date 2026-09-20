@@ -80,7 +80,64 @@ let state = {
     facebook: { status: 'ONLINE', countToday: 21, activeThreads: 3 },
     whatsapp: { status: 'ONLINE', countToday: 35, activeThreads: 6 },
     telegram: { status: 'ONLINE', countToday: 18, activeThreads: 2 },
-    customWeb: { status: 'ONLINE', countToday: 10, activeThreads: 1 }
+    customWeb: { status: 'ONLINE', countToday: 10, activeThreads: 1 },
+    youtube: { status: 'ONLINE', countToday: 15, activeThreads: 2 }
+  },
+  knowledgeBase: {
+    developerProfile: {
+      name: 'Abikul Hoque (Obikul Mia)',
+      handle: '@obi_kul_',
+      email: 'obimiahoque@gmail.com',
+      portfolio: 'https://abikul.lovable.app',
+      demoApp: 'https://obikul-ai-command-center.onrender.com'
+    },
+    packages: [
+      {
+        id: 'web-landing',
+        category: 'web_dev',
+        name: 'Starter Modern Responsive Landing Page / Frontend Build',
+        priceINR: 15000,
+        timeline: '3-5 business days',
+        description: 'Clean UI, mobile responsive, fast loading, tested code.'
+      },
+      {
+        id: 'web-fullstack',
+        category: 'web_dev',
+        name: 'Full-Stack Custom Business Website / Web App',
+        priceINR: 45000,
+        timeline: '10-14 business days',
+        description: 'Frontend, backend database, authentication, custom API integrations.'
+      },
+      {
+        id: 'ai-chatbot',
+        category: 'ai_agent',
+        name: 'Custom AI Automation Bot (Telegram / WhatsApp / Web)',
+        priceINR: 25000,
+        timeline: '3-7 business days',
+        description: '24/7 autonomous replies, CRM integration, lead qualification.'
+      },
+      {
+        id: 'ai-mission-control',
+        category: 'ai_agent',
+        name: 'Autonomous Multi-Channel AI Executive System (Cloud + Cockpit)',
+        priceINR: 65000,
+        timeline: '7-12 business days',
+        description: '24/7 Cloud Background server, live dashboard, multi-platform webhooks, startup sync.'
+      },
+      {
+        id: 'sponsorship-reel',
+        category: 'sponsorship',
+        name: 'Dedicated AI Tool / Web Dev Tutorial Reel',
+        priceINR: 30000,
+        timeline: '48 hours post product-approval',
+        description: 'Dedicated reel on Instagram & YouTube explaining tool with bio link.'
+      }
+    ],
+    rules: {
+      highValueThresholdINR: 35000, // Inquiries > ₹35,000 hold for Commander approval
+      advanceRequired: '50% advance to lock slot, 50% post-delivery',
+      allowedTopics: ['web development', 'website', 'landing page', 'ai agent', 'automation', 'bot', 'sponsorship', 'pricing', 'portfolio']
+    }
   },
   offlineQueue: [
     {
@@ -214,7 +271,7 @@ app.post('/webhook/gmail', (req, res) => {
   res.status(200).json({ status: 'PROCESSED', channel: 'gmail' });
 });
 
-// --- INSTAGRAM GRAPH API WEBHOOK ---
+// --- INSTAGRAM GRAPH API WEBHOOK (Direct Messages) ---
 app.post('/webhook/instagram', (req, res) => {
   const { sender, message, location } = req.body;
   console.log('📸 Inbound Instagram DM Received from:', sender || 'insta_user');
@@ -222,13 +279,44 @@ app.post('/webhook/instagram', (req, res) => {
   processInboundMessage({
     channel: 'instagram',
     sender: sender || '@creator_brand',
-    subject: 'Direct Message Inquiry',
-    content: message || 'Hey Commander Obikul! Loved your content. What are your sponsorship charges?',
-    location: location || 'London, UK',
-    dealEstimate: 50000
+    subject: 'Instagram Direct Message Inquiry',
+    content: message || 'Hey Obikul! Loved your AI and web development reels. What are your charges?',
+    location: location || 'London, UK'
   });
 
   res.status(200).json({ status: 'PROCESSED', channel: 'instagram' });
+});
+
+// --- INSTAGRAM REEL COMMENT WEBHOOK (Safe Anti-Spam Keyword Rotation) ---
+app.post('/webhook/instagram-comment', (req, res) => {
+  const { sender, comment, reelId, location } = req.body;
+  console.log('💬 Inbound Instagram Reel Comment from:', sender || 'viewer');
+
+  processInboundMessage({
+    channel: 'instagram_comment',
+    sender: sender || '@tech_enthusiast',
+    subject: `Reel #${reelId || 'LATEST'} Comment`,
+    content: comment || 'AGENT please send code',
+    location: location || 'Mumbai, India'
+  });
+
+  res.status(200).json({ status: 'PROCESSED', channel: 'instagram_comment' });
+});
+
+// --- YOUTUBE COMMENT WEBHOOK (Safe Public Community Response) ---
+app.post('/webhook/youtube-comment', (req, res) => {
+  const { author, comment, videoTitle, location } = req.body;
+  console.log('▶️ Inbound YouTube Comment from:', author || 'subscriber');
+
+  processInboundMessage({
+    channel: 'youtube_comment',
+    sender: author || 'YouTube Viewer',
+    subject: `Video: "${videoTitle || 'How to build an AI Agent'}"`,
+    content: comment || 'Great tutorial! Where can I find your website and project link?',
+    location: location || 'New Delhi, India'
+  });
+
+  res.status(200).json({ status: 'PROCESSED', channel: 'youtube_comment' });
 });
 
 // --- FACEBOOK PAGE MESSENGER WEBHOOK ---
@@ -239,10 +327,9 @@ app.post('/webhook/facebook', (req, res) => {
   processInboundMessage({
     channel: 'facebook',
     sender: sender || 'Global Marketing Agency FB',
-    subject: 'Facebook Lead Inquiry',
-    content: message || 'Hi Obikul, can we discuss a monthly retainer?',
-    location: location || 'Dubai, UAE',
-    dealEstimate: 110000
+    subject: 'Facebook Business Lead Inquiry',
+    content: message || 'Hi Obikul, can you build a modern responsive website for our agency?',
+    location: location || 'Dubai, UAE'
   });
 
   res.status(200).json({ status: 'PROCESSED', channel: 'facebook' });
@@ -255,11 +342,10 @@ app.post('/webhook/whatsapp', (req, res) => {
 
   processInboundMessage({
     channel: 'whatsapp',
-    sender: from || '+91 9876543210 (VIP Client)',
+    sender: from || '+91 9876543210 (VIP Lead)',
     subject: 'WhatsApp Priority Consultation',
-    content: message || 'Ready to start the project. Send invoice details.',
-    location: location || 'Mumbai, India',
-    dealEstimate: 95000
+    content: message || 'Need an AI Automation bot for our customer support.',
+    location: location || 'Singapore'
   });
 
   res.status(200).json({ status: 'PROCESSED', channel: 'whatsapp' });
@@ -267,41 +353,158 @@ app.post('/webhook/whatsapp', (req, res) => {
 
 // --- TELEGRAM BOT WEBHOOK ---
 app.post('/webhook/telegram', (req, res) => {
-  const { from, text } = req.body;
+  const { from, text, location } = req.body;
   console.log('✈️ Inbound Telegram Bot Message from:', from || '@telegram_user');
 
   processInboundMessage({
     channel: 'telegram',
     sender: from ? `@${from}` : '@investor_club',
     subject: 'Telegram Bot Alert Inquiry',
-    content: text || 'Please share the latest portfolio catalog.',
-    location: location || 'Singapore',
-    dealEstimate: 45000
+    content: text || 'Please share your web development rate card and portfolio link.',
+    location: location || 'Berlin, Germany'
   });
 
   res.status(200).json({ status: 'PROCESSED', channel: 'telegram' });
 });
 
-// --- CUSTOM WEBSITE WEBHOOK (Form Submissions / Custom CRM) ---
+// --- CUSTOM WEBSITE WEBHOOK (abikul.lovable.app Contact Form / CRM) ---
 app.post('/webhook/custom', (req, res) => {
   const { name, email, query, origin, location } = req.body;
-  console.log('🌐 Inbound Website Lead from:', email || name || 'Website Visitor');
+  console.log('🌐 Inbound Portfolio Lead from:', email || name || 'Website Visitor');
 
   processInboundMessage({
     channel: 'customWeb',
-    sender: `${name || 'Web Visitor'} (${email || 'visitor@web.com'})`,
-    subject: 'Website Custom Contact Form',
-    content: query || 'Requesting service demo and commercial proposal.',
-    location: location || 'Berlin, Germany',
-    dealEstimate: 80000
+    sender: `${name || 'Web Client'} (${email || 'client@business.com'})`,
+    subject: 'Portfolio Contact Form Submission',
+    content: query || 'Requesting quotation for custom full-stack website development.',
+    location: location || 'New York, USA'
   });
 
   res.status(200).json({ status: 'PROCESSED', channel: 'customWeb' });
 });
 
 // ==========================================
-// 4. AUTONOMOUS AI ENGINE LOGIC
+// 4. AUTONOMOUS AI KNOWLEDGE BASE & INTENT ENGINE
 // ==========================================
+
+function classifyAndProcessMessage(msgData) {
+  const text = ((msgData.content || '') + ' ' + (msgData.subject || '')).toLowerCase();
+  const channel = msgData.channel;
+
+  // 1. YouTube Comment Rule (Safe public comment, never mentions private DMs)
+  if (channel === 'youtube_comment') {
+    const ytReplies = [
+      `Thanks for watching! Complete code roadmap & developer portfolio: https://abikul.lovable.app | Email: obimiahoque@gmail.com`,
+      `Glad you found it helpful! Check out the live AI Agent command center demo here: https://obikul-ai-command-center.onrender.com 🚀`,
+      `Appreciate the support! More AI Agent & Web Dev tutorials dropping soon on the channel.`
+    ];
+    const reply = ytReplies[Math.floor(Math.random() * ytReplies.length)];
+    return {
+      category: 'youtube_public',
+      autoReplied: true,
+      dealValue: 0,
+      replyText: reply,
+      summary: 'Public YouTube comment reply dispatched with developer portfolio & demo links.'
+    };
+  }
+
+  // 2. Instagram Reel Comment Rule (Anti-Spam Keyword Guard)
+  if (channel === 'instagram_comment') {
+    const isKeyword = /agent|bot|code|prompt|web|link|source|details|price|rate/i.test(text);
+    if (!isKeyword) {
+      return {
+        category: 'instagram_general_comment',
+        autoReplied: true,
+        dealValue: 0,
+        replyText: '❤️ Thanks for watching! Follow @obi_kul_ for daily AI & Web Dev tutorials.',
+        summary: 'Engagement reply sent. (Anti-Spam frequency guard active).'
+      };
+    }
+    const dmRotations = [
+      `Hey! Thanks for commenting on the reel. Here is my developer portfolio & live AI Agent project: https://abikul.lovable.app 🔥 (Live Demo: https://obikul-ai-command-center.onrender.com)`,
+      `Sent you the details! Check out my web & AI agent packages at https://abikul.lovable.app or email obimiahoque@gmail.com 🚀`,
+      `Here is the link for the AI agent & web setup: https://abikul.lovable.app. Let me know if you want a custom build for your business! ⚡`
+    ];
+    return {
+      category: 'instagram_keyword_dm',
+      autoReplied: true,
+      dealValue: 15000,
+      replyText: dmRotations[Math.floor(Math.random() * dmRotations.length)],
+      summary: 'Triggered by reel keyword. Safe dynamic DM dispatched with portfolio & demo links.'
+    };
+  }
+
+  // 3. Sponsorship & Brand Collaboration
+  if (/sponsor|collaboration|collab|promote|shoutout|brand deal|reel price|promotion/i.test(text)) {
+    return {
+      category: 'sponsorship',
+      autoReplied: true,
+      dealValue: 30000,
+      replyText: `Hello! Thanks for reaching out. Here is Commander Obikul's Creator Rate Card: Dedicated AI/Web Reel (₹30,000) | Combo: Reel + Bio Link + Story (₹45,000). 50% advance to lock slot. Portfolio: https://abikul.lovable.app. Email: obimiahoque@gmail.com`,
+      summary: 'Sponsorship inquiry detected. Auto-replied Creator Rate Card & terms.'
+    };
+  }
+
+  // 4. Web Development Inquiries
+  if (/web|website|landing page|frontend|portfolio|ui|fullstack|developer|redesign|build site/i.test(text)) {
+    const isEnterprise = /enterprise|fullstack|custom app|e-commerce|large scale|portal|database/i.test(text);
+    const dealVal = isEnterprise ? 45000 : 15000;
+    const threshold = (state.knowledgeBase && state.knowledgeBase.rules) ? state.knowledgeBase.rules.highValueThresholdINR : 35000;
+
+    if (dealVal > threshold) {
+      return {
+        category: 'web_dev_enterprise',
+        autoReplied: false, // HOLD FOR COMMANDER APPROVAL!
+        dealValue: dealVal,
+        replyText: `Drafted custom proposal for Full-Stack Web App (₹${dealVal.toLocaleString()}) linking https://abikul.lovable.app. Held for Commander Obikul approval.`,
+        summary: `High-value Web Development inquiry (₹${dealVal.toLocaleString()}). Quoted & queued for Commander review.`
+      };
+    }
+
+    return {
+      category: 'web_dev_standard',
+      autoReplied: true,
+      dealValue: dealVal,
+      replyText: `Hi! Thanks for contacting Obikul Web Dev Studio. Starter Responsive Landing Pages start at ₹15,000 (3-5 days delivery), and Full-Stack Web Apps start at ₹45,000. View live builds at https://abikul.lovable.app or reply to schedule a kickoff!`,
+      summary: 'Web Development inquiry. Auto-replied standard packages & portfolio link.'
+    };
+  }
+
+  // 5. AI Agent & Automation Bot Inquiries
+  if (/ai agent|bot|automation|chatbot|telegram bot|whatsapp bot|workflow|jarvis|ai system|command center/i.test(text)) {
+    const isEnterprise = /custom ai|multi-channel|cloud|enterprise|company bot|system/i.test(text);
+    const dealVal = isEnterprise ? 65000 : 25000;
+    const threshold = (state.knowledgeBase && state.knowledgeBase.rules) ? state.knowledgeBase.rules.highValueThresholdINR : 35000;
+
+    if (dealVal > threshold) {
+      return {
+        category: 'ai_agent_enterprise',
+        autoReplied: false, // HOLD FOR COMMANDER APPROVAL!
+        dealValue: dealVal,
+        replyText: `Drafted Autonomous AI Architecture proposal (₹${dealVal.toLocaleString()}). Held for Commander Obikul approval.`,
+        summary: `High-value AI Agent contract (₹${dealVal.toLocaleString()}). Held for Commander review.`
+      };
+    }
+
+    return {
+      category: 'ai_agent_standard',
+      autoReplied: true,
+      dealValue: dealVal,
+      replyText: `Hello! I'm Obikul's AI assistant. We build Custom Automation Bots (₹25,000) and 24/7 Cloud AI Executive Systems (₹65,000). See our live command center at https://obikul-ai-command-center.onrender.com or portfolio at https://abikul.lovable.app.`,
+      summary: 'AI Agent inquiry. Auto-replied with AI package rates & live demo.'
+    };
+  }
+
+  // 6. Unknown / Uncategorized Inquiry (Safety Guard)
+  return {
+    category: 'unknown_safety_guard',
+    autoReplied: false, // HOLD FOR COMMANDER REVIEW
+    dealValue: 20000,
+    replyText: `Thank you for reaching out. Commander Obikul Mia has been notified and will personally review your request shortly (Email: obimiahoque@gmail.com).`,
+    summary: 'Uncategorized inquiry. Safety guard active: Held for Commander review.'
+  };
+}
+
 function processInboundMessage(msgData) {
   // Check Panic Freeze
   if (state.systemSettings.isPanicFrozen) {
@@ -311,36 +514,36 @@ function processInboundMessage(msgData) {
 
   // Update metrics
   state.metrics.totalStreams++;
-  if (state.channels[msgData.channel]) {
-    state.channels[msgData.channel].countToday++;
+  const chanKey = msgData.channel.startsWith('instagram') ? 'instagram' : (msgData.channel.startsWith('youtube') ? 'youtube' : msgData.channel);
+  if (state.channels[chanKey]) {
+    state.channels[chanKey].countToday++;
   }
 
-  // Analyze intent & Auto-reply
-  let actionTaken = '';
-  let autoReplied = false;
+  // Classify intent using knowledge base
+  const decision = classifyAndProcessMessage(msgData);
+  const willAutoReply = state.systemSettings.isFullAuto && decision.autoReplied;
 
-  if (state.systemSettings.isFullAuto) {
-    autoReplied = true;
+  if (willAutoReply) {
     state.metrics.autonomousActions++;
-    state.metrics.revenueProtected += (msgData.dealEstimate || 35000);
-    actionTaken = `AI matched rate-card knowledge base & automatically replied with tailored proposal to ${msgData.sender}.`;
-    logActivity(`⚡ [AUTO-REPLIED] (${msgData.channel.toUpperCase()}) ${msgData.sender}: Sent PDF rates & scheduled meeting.`);
+    state.metrics.revenueProtected += (decision.dealValue || 20000);
+    logActivity(`⚡ [AUTO-REPLIED] (${chanKey.toUpperCase()}) ${msgData.sender}: ${decision.summary}`);
   } else {
     state.metrics.approvalQueue++;
-    actionTaken = `Drafted response and queued for Commander Obikul's manual review.`;
-    logActivity(`📝 [APPROVAL QUEUED] (${msgData.channel.toUpperCase()}) ${msgData.sender}: Awaiting Commander approval.`);
+    logActivity(`📝 [APPROVAL REQUIRED] (${chanKey.toUpperCase()}) ${msgData.sender}: ${decision.summary}`, 'warn');
   }
 
   const queueItem = {
     id: 'OFF-' + Math.floor(Math.random() * 90000 + 10000),
-    channel: msgData.channel,
+    channel: chanKey,
     sender: msgData.sender,
     location: msgData.location || 'Global Node',
     subject: msgData.subject,
-    summary: actionTaken,
-    status: autoReplied ? 'AUTO_RESOLVED' : 'PENDING_COMMANDER',
+    summary: decision.summary,
+    replyText: decision.replyText,
+    category: decision.category,
+    status: willAutoReply ? 'AUTO_RESOLVED' : 'PENDING_COMMANDER',
     timestamp: Date.now(),
-    dealValue: msgData.dealEstimate || 50000
+    dealValue: decision.dealValue || 25000
   };
 
   state.offlineQueue.unshift(queueItem);
