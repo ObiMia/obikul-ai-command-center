@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: obikul-ai-command-center
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: DEFAULT_VOICE_ID
+        value: JBFqnCBsd6RMkjVDRZzb
+      - key: DEFAULT_VOICE_MODEL
+        value: eleven_multilingual_v2
+      - key: ELEVENLABS_API_KEY
+        sync: false
