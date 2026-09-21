@@ -256,19 +256,30 @@ function handleClientCommand(data, ws) {
 
 // --- GMAIL WEBHOOK (Google Pub/Sub) ---
 app.post('/webhook/gmail', (req, res) => {
-  const { message, sender, subject, location } = req.body;
-  console.log('📧 Inbound Gmail Event Received from:', sender || 'Unknown');
+  const { content, sender, subject, location } = req.body;
+  console.log('📧 Inbound Gmail Received from:', sender || 'Unknown');
 
-  processInboundMessage({
+  // Classify the email and get AI decision immediately
+  const msgData = {
     channel: 'gmail',
     sender: sender || 'client@business.com',
-    subject: subject || 'Project Collaboration Proposal',
-    content: message || 'Interested in collaboration and rate details.',
-    location: location || 'New York, USA',
-    dealEstimate: 75000
-  });
+    subject: subject || 'General Inquiry',
+    content: content || '',
+    location: location || 'Gmail'
+  };
 
-  res.status(200).json({ status: 'PROCESSED', channel: 'gmail' });
+  const decision = classifyAndProcessMessage(msgData);
+  processInboundMessage(msgData);
+
+  // Return replyText so Google Apps Script can create Gmail Draft
+  res.status(200).json({
+    status: 'PROCESSED',
+    channel: 'gmail',
+    category: decision.category,
+    autoReplied: decision.autoReplied,
+    replyText: decision.replyText,
+    dealValue: decision.dealValue
+  });
 });
 
 // --- INSTAGRAM GRAPH API WEBHOOK (Direct Messages) ---
